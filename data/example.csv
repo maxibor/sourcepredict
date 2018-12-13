@@ -1,0 +1,11 @@
+,OTU1,OTU2,OTU3,label
+SampleA,10,30,20,source1
+SampleB,10,30,20,source1
+SampleC,10,30,20,source1
+SampleD,20,20,10,source2
+SampleE,20,20,10,source2
+SampleF,20,20,10,source2
+SampleG,30,10,30,source3
+SampleH,30,10,30,source3
+SampleI,30,10,30,source3
+SampleJ,27,14,7,sink
