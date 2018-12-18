@@ -20,6 +20,11 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         ''')
     parser.add_argument('otu_table', help="path to otu table in csv format")
     parser.add_argument(
+        '-a',
+        dest="alpha",
+        default=0.1,
+        help="Proportion of sink sample in unknown. Default = 0.1")
+    parser.add_argument(
         '-s',
         dest="sources",
         default='./data/dog_human_pig_sources.csv',
@@ -43,16 +48,18 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     args = parser.parse_args()
 
     sink = args.otu_table
+    alpha = args.alpha
     sources = args.sources
     seed = int(args.seed)
     threads = int(args.threads)
 
-    return(sink, sources, seed, threads)
+    return(sink, alpha, sources, seed, threads)
 
 
 if __name__ == "__main__":
     version = "0.1"
-    SINK, SOURCES, SEED, THREADS = _get_args()
+    SINK, ALPHA, SOURCES, SEED, THREADS = _get_args()
     a = sourceforest(source=SOURCES, sink=SINK)
+    a._add_unknown(alpha=ALPHA)
     a.normalize()
     a.rndForest(seed=SEED, threads=THREADS)

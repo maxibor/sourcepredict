@@ -8,6 +8,8 @@ from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from . import normalize
 
+from . import utils
+
 
 class sourceforest():
 
@@ -16,26 +18,45 @@ class sourceforest():
         self.tmp_feat = self.source.drop(
             ['labels'], axis=0).apply(pd.to_numeric)
         self.y = self.source.loc['labels', :][1:]
+        self.y = self.y.append(pd.Series(['unknown'], index=['unknown']))
         self.tmp_sink = pd.read_csv(sink, dtype='int64')
         self.combined = pd.DataFrame(pd.merge(
-            left=self.tmp_feat, right=self.tmp_sink, how='outer', on='TAXID').drop(['TAXID'], axis=1).fillna(0))
+            left=self.tmp_feat, right=self.tmp_sink, how='outer', on='TAXID').fillna(0))
         return None
+
+    def __repr__(self):
+        return(f'A sourceforest object of source {self.source} and sink {self.sink}')
+
+    def _add_unknown(self, alpha):
+        '''
+        alpha: proportion of unknown for each OTU
+        '''
+        self._ = self.tmp_sink.drop('TAXID', 1)
+        self.unknown = self._.multiply(alpha)
+        self.unknown['TAXID'] = self.tmp_sink['TAXID']
+        self.unknown.columns = ['UNKNOWN', 'TAXID']
+        self.combined_unknown = pd.merge(left=self.combined, right=self.unknown,
+                                         on='TAXID', how='outer').drop(['TAXID'], axis=1).fillna(0)
 
     def normalize(self):
         print(type(self.combined))
-        self.normalized = normalize.RLE_normalize(self.combined)
+        self.normalized = normalize.RLE_normalize(
+            self.combined.drop(['TAXID'], axis=1))
+        self.normalized['UNKNOWN'] = self.combined_unknown['UNKNOWN']
         self.feat = self.normalized.loc[:, self.source.columns[1:]].T
+        self.feat.loc['UNKNOWN', :] = self.normalized['UNKNOWN']
         self.sink = self.normalized.drop(self.source.columns[1:], axis=1).T
+        self.sink = self.sink.drop('UNKNOWN', axis=0)
         return(self.feat, self.sink)
 
     def rndForest(self, seed, threads):
         train_features, test_features, train_labels, test_labels = train_test_split(
             self.feat, self.y, test_size=0.2)
         self._forest = RandomForestClassifier(
-            n_jobs=threads, n_estimators=1000)
+            n_jobs=threads, n_estimators=1000, class_weight="balanced")
         print("Training classifier")
         self._forest.fit(train_features, train_labels)
         y_pred = self._forest.predict(test_features)
         print("Training Accuracy:", metrics.accuracy_score(test_labels, y_pred))
-        sink_pred = self._forest.predict_proba(self.sink)
-        print(sink_pred)
+        self.sink_pred = self._forest.predict_proba(self.sink)
+        utils.print_class(classes=self._forest.classes_, pred=self.sink_pred)
