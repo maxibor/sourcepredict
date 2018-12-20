@@ -10,14 +10,14 @@ def _get_args():
     parser = argparse.ArgumentParser(
         prog='SourcePredict v' + str(version),
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        description='''
-==================================================\n
-SourcePredict\n
+        description=f'''
+==========================================================
+SourcePredict v{version}
 Coprolite source classification
-Author: Maxime Borry\n
-Contact: <borry[at]shh.mpg.de>\n
+Author: Maxime Borry
+Contact: <borry[at]shh.mpg.de>
 Homepage & Documentation: github.com/maxibor/sourcepredict
-==================================================
+==========================================================
         ''')
     parser.add_argument('otu_table', help="path to otu table in csv format")
     parser.add_argument(
