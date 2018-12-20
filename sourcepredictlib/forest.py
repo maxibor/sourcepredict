@@ -38,10 +38,17 @@ class sourceforest():
         self.combined_unknown = pd.merge(left=self.combined, right=self.unknown,
                                          on='TAXID', how='outer').drop(['TAXID'], axis=1).fillna(0)
 
-    def normalize(self):
+    def normalize(self, method):
         print(type(self.combined))
-        self.normalized = normalize.RLE_normalize(
-            self.combined.drop(['TAXID'], axis=1))
+        if method == 'RLE':
+            self.normalized = normalize.RLE_normalize(
+                self.combined.drop(['TAXID'], axis=1))
+        elif method == 'SUBSAMPLE':
+            self.normalized = normalize.subsample_normalize_pd(
+                self.combined.drop(['TAXID'], axis=1))
+        elif method == 'CLR':
+            self.normalized = normalize.CLR_normalize(
+                self.combined.drop(['TAXID'], axis=1))
         self.normalized['UNKNOWN'] = self.combined_unknown['UNKNOWN']
         self.feat = self.normalized.loc[:, self.source.columns[1:]].T
         self.feat.loc['UNKNOWN', :] = self.normalized['UNKNOWN']
@@ -51,9 +58,9 @@ class sourceforest():
 
     def rndForest(self, seed, threads):
         train_features, test_features, train_labels, test_labels = train_test_split(
-            self.feat, self.y, test_size=0.2)
+            self.feat, self.y, test_size=0.2, random_state=seed)
         self._forest = RandomForestClassifier(
-            n_jobs=threads, n_estimators=1000, class_weight="balanced")
+            n_jobs=threads, n_estimators=1000, class_weight="balanced", random_state=seed)
         print("Training classifier")
         self._forest.fit(train_features, train_labels)
         y_pred = self._forest.predict(test_features)

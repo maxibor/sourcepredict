@@ -2,6 +2,7 @@
 
 import argparse
 from sourcepredictlib.forest import sourceforest
+from sourcepredictlib import utils
 
 
 def _get_args():
@@ -30,6 +31,11 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         default='./data/dog_human_pig_sources.csv',
         help="Path to source csv file. Default = ./data/dog_human_pig_sources.csv")
     parser.add_argument(
+        '-n',
+        dest="normalization",
+        default='Subsample',
+        help="Normalization method (RLE | CLR | Subsample). Default = Subsample")
+    parser.add_argument(
         '-o',
         dest="output",
         default=None,
@@ -37,8 +43,8 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     parser.add_argument(
         '-se',
         dest="seed",
-        default=7357,
-        help="Seed for random generator. Default = 7357")
+        default=None,
+        help="Seed for random generator. Default = None (randomly generated)")
     parser.add_argument(
         '-t',
         dest="threads",
@@ -49,17 +55,20 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
 
     sink = args.otu_table
     alpha = args.alpha
+    normalization = args.normalization
     sources = args.sources
-    seed = int(args.seed)
+    seed = args.seed
     threads = int(args.threads)
 
-    return(sink, alpha, sources, seed, threads)
+    return(sink, alpha, normalization, sources, seed, threads)
 
 
 if __name__ == "__main__":
     version = "0.1"
-    SINK, ALPHA, SOURCES, SEED, THREADS = _get_args()
+    SINK, ALPHA, NORMALIZATION, SOURCES, SEED, THREADS = _get_args()
+    SEED = utils.check_gen_seed(SEED)
+    NORMALIZATION = utils.check_norm(NORMALIZATION)
     a = sourceforest(source=SOURCES, sink=SINK)
     a._add_unknown(alpha=ALPHA)
-    a.normalize()
+    a.normalize(method=NORMALIZATION)
     a.rndForest(seed=SEED, threads=THREADS)
