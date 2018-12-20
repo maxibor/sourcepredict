@@ -27,7 +27,7 @@ class sourceforest():
     def __repr__(self):
         return(f'A sourceforest object of source {self.source} and sink {self.sink}')
 
-    def _add_unknown(self, alpha):
+    def add_unknown(self, alpha):
         '''
         alpha: proportion of unknown for each OTU
         '''

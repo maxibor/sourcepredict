@@ -69,6 +69,6 @@ if __name__ == "__main__":
     SEED = utils.check_gen_seed(SEED)
     NORMALIZATION = utils.check_norm(NORMALIZATION)
     a = sourceforest(source=SOURCES, sink=SINK)
-    a._add_unknown(alpha=ALPHA)
+    a.add_unknown(alpha=ALPHA)
     a.normalize(method=NORMALIZATION)
     a.rndForest(seed=SEED, threads=THREADS)
