@@ -1,9 +1,21 @@
 import sys
 import random
+import numpy as np
 
 
 def print_class(classes, pred):
     [print(f'{i}:{j}') for i, j in zip(list(classes), list(pred[0, :]))]
+
+
+def print_ratio(classes, pred, ratio_orga):
+    pred_class = {i.upper(): j for i, j in zip(
+        list(classes), list(pred[0, :]))}
+    num = pred_class[ratio_orga.upper()]
+    denom = 0
+    for i in pred_class.keys():
+        if i != ratio_orga.upper():
+            denom += pred_class[i]
+    print(np.log(num/denom))
 
 
 def check_norm(method):

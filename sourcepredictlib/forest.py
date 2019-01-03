@@ -56,7 +56,7 @@ class sourceforest():
         self.sink = self.sink.drop('UNKNOWN', axis=0)
         return(self.feat, self.sink)
 
-    def rndForest(self, seed, threads):
+    def rndForest(self, seed, threads, ratio):
         train_features, test_features, train_labels, test_labels = train_test_split(
             self.feat, self.y, test_size=0.2, random_state=seed)
         self._forest = RandomForestClassifier(
@@ -67,3 +67,5 @@ class sourceforest():
         print("Training Accuracy:", metrics.accuracy_score(test_labels, y_pred))
         self.sink_pred = self._forest.predict_proba(self.sink)
         utils.print_class(classes=self._forest.classes_, pred=self.sink_pred)
+        utils.print_ratio(classes=self._forest.classes_,
+                          pred=self.sink_pred, ratio_orga=ratio)

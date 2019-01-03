@@ -31,6 +31,11 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         default='./data/dog_human_pig_sources.csv',
         help="Path to source csv file. Default = ./data/dog_human_pig_sources.csv")
     parser.add_argument(
+        '-r',
+        dest="ratio",
+        default='human',
+        help="Target organism for ratio calculation. Default = 'human'")
+    parser.add_argument(
         '-n',
         dest="normalization",
         default='Subsample',
@@ -56,19 +61,20 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     sink = args.otu_table
     alpha = args.alpha
     normalization = args.normalization
+    ratio = args.ratio
     sources = args.sources
     seed = args.seed
     threads = int(args.threads)
 
-    return(sink, alpha, normalization, sources, seed, threads)
+    return(sink, alpha, normalization, sources, ratio, seed, threads)
 
 
 if __name__ == "__main__":
     version = "0.1"
-    SINK, ALPHA, NORMALIZATION, SOURCES, SEED, THREADS = _get_args()
+    SINK, ALPHA, NORMALIZATION, SOURCES, RATIO, SEED, THREADS = _get_args()
     SEED = utils.check_gen_seed(SEED)
     NORMALIZATION = utils.check_norm(NORMALIZATION)
     a = sourceforest(source=SOURCES, sink=SINK)
     a.add_unknown(alpha=ALPHA)
     a.normalize(method=NORMALIZATION)
-    a.rndForest(seed=SEED, threads=THREADS)
+    a.rndForest(seed=SEED, threads=THREADS, ratio=RATIO)
