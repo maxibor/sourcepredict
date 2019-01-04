@@ -11,12 +11,11 @@ $ ./sourcepredict -r canis_familiaris ./data/test/dog_test_sample.csv
 Training classifier on 2 cores...
 Training Accuracy: 1.0
 =================
-Canis_familiaris:0.938
-Homo_sapiens:0.0
-Sus_scrofa:0.002
-human:0.007
-unknown:0.053
-LogRatio canis_familiaris/others = 2.716615563961133
+Canis_familiaris:0.96
+Homo_sapiens:0.003
+Sus_scrofa:0.0
+unknown:0.037
+LogRatio canis_familiaris/others = 3.1780538303479458
 ```
 
 ## Help
