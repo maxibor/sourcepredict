@@ -3,11 +3,29 @@
 # SourcePredict
 
 Prediction/source tracking of sample source using a random forest approach
+
+# Example
+
+```bash
+$ ./sourcepredict -r canis_familiaris ./data/test/dog_test_sample.csv
+Training classifier on 2 cores...
+Training Accuracy: 1.0
+=================
+Canis_familiaris:0.938
+Homo_sapiens:0.0
+Sus_scrofa:0.002
+human:0.007
+unknown:0.053
+LogRatio canis_familiaris/others = 2.716615563961133
+```
+
 ## Help
 
 ```
-usage: SourcePredict v0.1 [-h] [-a ALPHA] [-s SOURCES] [-n NORMALIZATION]
-                          [-o OUTPUT] [-se SEED] [-t THREADS]
+$ ./sourcepredict -h
+usage: SourcePredict v0.1 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS] [-r RATIO]
+                          [-n NORMALIZATION] [-o OUTPUT] [-se SEED]
+                          [-t THREADS]
                           otu_table
 
 ==========================================================
@@ -27,8 +45,11 @@ optional arguments:
   -a ALPHA          Proportion of sink sample in unknown. Default = 0.1
   -s SOURCES        Path to source csv file. Default =
                     ./data/dog_human_pig_sources.csv
+  -l LABELS         Path to labels csv file. Default = ./data/labels.csv
+  -r RATIO          Target organism for ratio calculation. Default =
+                    'Homo_sapiens'
   -n NORMALIZATION  Normalization method (RLE | CLR | Subsample). Default =
-                    Subsample
+                    RLE
   -o OUTPUT         Output file basename. Default =
                     <sample_basename>.sourcepredict.csv*
   -se SEED          Seed for random generator. Default = None (randomly

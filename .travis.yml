@@ -8,4 +8,4 @@ install:
   - pip install sklearn
 # command to run tests
 script: 
-  - python sourcepredict data/dog_test_sample.csv
+  - python sourcepredict -r canis_familiaris ./data/test/dog_test_sample.csv

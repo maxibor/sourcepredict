@@ -13,15 +13,14 @@ from . import utils
 
 class sourceforest():
 
-    def __init__(self, source, sink):
+    def __init__(self, source, sink, labels):
         self.source = pd.read_csv(source, index_col=0)
-        self.tmp_feat = self.source.drop(
-            ['labels'], axis=0).apply(pd.to_numeric)
-        self.y = self.source.loc['labels', :][1:]
+        y = pd.read_csv(labels, index_col=0)
+        self.y = y['labels']
         self.y = self.y.append(pd.Series(['unknown'], index=['unknown']))
         self.tmp_sink = pd.read_csv(sink, dtype='int64')
         self.combined = pd.DataFrame(pd.merge(
-            left=self.tmp_feat, right=self.tmp_sink, how='outer', on='TAXID').fillna(0))
+            left=self.source, right=self.tmp_sink, how='outer', on='TAXID').fillna(0))
         return None
 
     def __repr__(self):
@@ -39,7 +38,6 @@ class sourceforest():
                                          on='TAXID', how='outer').drop(['TAXID'], axis=1).fillna(0)
 
     def normalize(self, method):
-        print(type(self.combined))
         if method == 'RLE':
             self.normalized = normalize.RLE_normalize(
                 self.combined.drop(['TAXID'], axis=1))
@@ -61,10 +59,11 @@ class sourceforest():
             self.feat, self.y, test_size=0.2, random_state=seed)
         self._forest = RandomForestClassifier(
             n_jobs=threads, n_estimators=1000, class_weight="balanced", random_state=seed)
-        print("Training classifier")
+        print(f"Training classifier on {threads} cores...")
         self._forest.fit(train_features, train_labels)
         y_pred = self._forest.predict(test_features)
-        print("Training Accuracy:", metrics.accuracy_score(test_labels, y_pred))
+        print("Training Accuracy:", metrics.accuracy_score(
+            test_labels, y_pred), "\n=================")
         self.sink_pred = self._forest.predict_proba(self.sink)
         utils.print_class(classes=self._forest.classes_, pred=self.sink_pred)
         utils.print_ratio(classes=self._forest.classes_,

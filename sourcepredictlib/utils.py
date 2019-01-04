@@ -15,7 +15,7 @@ def print_ratio(classes, pred, ratio_orga):
     for i in pred_class.keys():
         if i != ratio_orga.upper():
             denom += pred_class[i]
-    print(np.log(num/denom))
+    print(f"LogRatio {ratio_orga}/others = {np.log(num/denom)}")
 
 
 def check_norm(method):
