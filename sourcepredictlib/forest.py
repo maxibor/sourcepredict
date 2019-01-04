@@ -1,4 +1,4 @@
-#!/usr/bin/env python -W ignore::DeprecationWarning
+#!/usr/bin/env python3
 
 import pandas as pd
 import numpy as np
@@ -58,7 +58,7 @@ class sourceforest():
         train_features, test_features, train_labels, test_labels = train_test_split(
             self.feat, self.y, test_size=0.2, random_state=seed)
         self._forest = RandomForestClassifier(
-            n_jobs=threads, n_estimators=1000, class_weight="balanced", random_state=seed)
+            n_jobs=threads, n_estimators=10000, class_weight="balanced", random_state=seed)
         print(f"Training classifier on {threads} cores...")
         self._forest.fit(train_features, train_labels)
         y_pred = self._forest.predict(test_features)

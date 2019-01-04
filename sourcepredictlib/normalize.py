@@ -1,4 +1,4 @@
-#!/usr/bin/env python -W ignore::DeprecationWarning
+#!/usr/bin/env python3
 
 from numpy import log, average, inf, nan, median, exp, interp, floor
 import pandas as pd
