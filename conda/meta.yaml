@@ -1,0 +1,25 @@
+package:
+  name: sourcepredict
+  version: "0.1"
+
+source:
+  path: ../
+
+requirements:
+  run:
+    - python 3.6.*
+    - numpy
+    - pandas
+    - scikit-learn
+
+
+test:
+  source_files:
+    - data
+  commands:
+    - sourcepredict --help
+
+about:
+  home: https://github.com/maxibor/sourcepredict
+  license: GPL-3.0
+  summary: 'Prediction/source tracking of sample source using a random forest approach'

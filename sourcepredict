@@ -3,6 +3,7 @@
 import argparse
 from sourcepredictlib.forest import sourceforest
 from sourcepredictlib import utils
+import os
 
 
 def _get_args():
@@ -28,13 +29,15 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     parser.add_argument(
         '-s',
         dest="sources",
-        default='./data/dog_human_pig_sources.csv',
-        help="Path to source csv file. Default = ./data/dog_human_pig_sources.csv")
+        default=os.path.dirname(os.path.abspath(
+            __file__))+'/data/sourcepredict_sources.csv',
+        help="Path to source csv file. Default = data/sourcepredict_sources.csv")
     parser.add_argument(
         '-l',
         dest="labels",
-        default='./data/labels.csv',
-        help="Path to labels csv file. Default = ./data/labels.csv")
+        default=os.path.dirname(os.path.abspath(
+            __file__)) + '/data/sourcepredict_labels.csv',
+        help="Path to labels csv file. Default = data/sourcepredict_labels.csv")
     parser.add_argument(
         '-r',
         dest="ratio",

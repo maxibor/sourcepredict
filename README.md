@@ -43,8 +43,9 @@ optional arguments:
   -h, --help        show this help message and exit
   -a ALPHA          Proportion of sink sample in unknown. Default = 0.1
   -s SOURCES        Path to source csv file. Default =
-                    ./data/dog_human_pig_sources.csv
-  -l LABELS         Path to labels csv file. Default = ./data/labels.csv
+                    ./data/sourcepredict_sources.csv
+  -l LABELS         Path to labels csv file. Default =
+                    ./data/sourcepredict_labels.csv
   -r RATIO          Target organism for ratio calculation. Default =
                     'Homo_sapiens'
   -n NORMALIZATION  Normalization method (RLE | CLR | Subsample). Default =
