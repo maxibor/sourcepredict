@@ -4,7 +4,7 @@
 
 Prediction/source tracking of sample source using a random forest approach
 
-# Example
+## Example
 
 ```bash
 $ ./sourcepredict -r canis_familiaris ./data/test/dog_test_sample.csv
@@ -55,3 +55,19 @@ optional arguments:
                     generated)
   -t THREADS        Number of threads for parallel processing. Default = 2
 ```
+
+## Sourcepredict source file
+- The sources were obtained with the [Kraken based pipeline](utils/kraken_pipeline/kraken_pipe.nf) included in this repository, using the [*Dustmasked MiniKraken DB 4GB*](https://ccb.jhu.edu/software/kraken/dl/minikraken_20171101_4GB_dustmasked.tgz).  
+- The source file if here [data/dog_human_pig_sources.csv](data/dog_human_pig_sources.csv)
+- The labels for this source file is here [data/labels.csv](data/labels.csv)
+
+
+### Current species included in the source file
+
+- *Sus scrofa*
+- *Homo sapiens*
+- *Canis familiaris*
+
+### Updating the source file 
+
+To update the sourcefile with new kraken results, see the instruction in the [dedicated Jupyter notebook](notebooks/merge_new_data.ipynb) 
