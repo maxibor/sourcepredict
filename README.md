@@ -4,10 +4,16 @@
 
 Prediction/source tracking of sample source using a random forest approach
 
+## Installation
+
+```
+$ conda install -c maxibor sourcepredict
+```
+
 ## Example
 
 ```bash
-$ ./sourcepredict -r canis_familiaris ./data/test/dog_test_sample.csv
+$ sourcepredict -r canis_familiaris ./data/test/dog_test_sample.csv
 Training classifier on 2 cores...
 Training Accuracy: 1.0
 =================
@@ -21,7 +27,7 @@ LogRatio canis_familiaris/others = 3.1780538303479458
 ## Help
 
 ```
-$ ./sourcepredict -h
+$ sourcepredict -h
 usage: SourcePredict v0.1 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS] [-r RATIO]
                           [-n NORMALIZATION] [-o OUTPUT] [-se SEED]
                           [-t THREADS]
