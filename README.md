@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/maxibor/sourcepredict.svg?token=pwT9AgYi4qJY4LTp9WUy&branch=master)](https://travis-ci.com/maxibor/sourcepredict) [![Anaconda-Server Badge](https://anaconda.org/maxibor/sourcepredict/badges/installer/conda.svg)](https://conda.anaconda.org/maxibor)
 
-# SourcePredict
+<img src="img/sourcepredict_logo.png" width="300">
 
 Prediction/source tracking of sample source using a random forest approach
 
