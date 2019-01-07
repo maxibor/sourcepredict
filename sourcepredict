@@ -4,6 +4,7 @@ import argparse
 from sourcepredictlib.forest import sourceforest
 from sourcepredictlib import utils
 import os
+import warnings
 
 
 def _get_args():
@@ -52,12 +53,17 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         '-o',
         dest="output",
         default=None,
-        help="Output file basename. Default = <sample_basename>.sourcepredict.csv*")
+        help="Output file basename. Default = <sample_basename>.sourcepredict.csv")
     parser.add_argument(
         '-se',
         dest="seed",
         default=None,
         help="Seed for random generator. Default = None (randomly generated)")
+    parser.add_argument(
+        '-k',
+        dest="kfold",
+        default=3,
+        help="Number of fold for K-fold cross validation in feature selection and parameter optimization. Default = 3")
     parser.add_argument(
         '-t',
         dest="threads",
@@ -73,17 +79,24 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     sources = args.sources
     labels = args.labels
     seed = args.seed
+    output = args.output
+    kfold = args.kfold
     threads = int(args.threads)
 
-    return(sink, alpha, normalization, sources, labels, ratio, seed, threads)
+    return(sink, alpha, normalization, sources, labels, ratio, seed, output, kfold, threads)
 
 
 if __name__ == "__main__":
-    version = "0.1"
-    SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, RATIO, SEED, THREADS = _get_args()
+    version = "0.1.1"
+    warnings.filterwarnings("ignore")
+    SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, RATIO, SEED, OUTPUT, KFOLD, THREADS = _get_args()
     SEED = utils.check_gen_seed(SEED)
     NORMALIZATION = utils.check_norm(NORMALIZATION)
     a = sourceforest(source=SOURCES, sink=SINK, labels=LABELS)
     a.add_unknown(alpha=ALPHA)
     a.normalize(method=NORMALIZATION)
-    a.rndForest(seed=SEED, threads=THREADS, ratio=RATIO)
+    a.select_features(cv=KFOLD)
+    if OUTPUT is None:
+        OUTPUT = f"{utils._get_basename(SINK)}.sourcepredict.csv"
+    a.rndForest(seed=SEED, threads=THREADS, ratio=RATIO,
+                outfile=OUTPUT, kfold=KFOLD)

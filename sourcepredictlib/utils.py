@@ -35,3 +35,18 @@ def check_gen_seed(seed):
         return(random.randint(1, 10000))
     else:
         return(int(seed))
+
+
+def _get_basename(file_name):
+    if ("/") in file_name:
+        basename = file_name.split("/")[-1].split(".")[0]
+    else:
+        basename = file_name.split(".")[0]
+    return(basename)
+
+
+def write_out(outfile, classes, pred):
+    str_pred = [str(i) for i in list(pred[0])]
+    with open(outfile, 'w') as f:
+        f.write(",".join(list(classes))+'\n')
+        f.write(",".join(list(str_pred))+'\n')
