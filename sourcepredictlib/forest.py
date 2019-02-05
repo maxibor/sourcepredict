@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import RFECV
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
+from collections import Counter
 from . import normalize
 
 from . import utils
@@ -19,24 +20,37 @@ class sourceforest():
         self.source = pd.read_csv(source, index_col=0)
         y = pd.read_csv(labels, index_col=0)
         self.y = y['labels']
-        self.y = self.y.append(pd.Series(['UNKNOWN'], index=['UNKNOWN']))
         self.tmp_sink = pd.read_csv(sink, index_col=0, dtype='int64')
         self.combined = pd.DataFrame(pd.merge(
             left=self.source, right=self.tmp_sink, how='outer', left_index=True, right_index=True).fillna(0))
         return None
 
     def __repr__(self):
-        return(f'A sourceforest object of source {self.source} and sink {self.sink}')
+        return(f'A sourceforest object of source {self.source} and sink {self.tmp_sink}')
 
     def add_unknown(self, alpha):
-        '''
-        alpha: proportion of unknown for each OTU
-        '''
-        self.unknown = self.tmp_sink.multiply(alpha)
-        self.unknown.set_index(self.tmp_sink.index)
-        self.unknown.columns = ['UNKNOWN']
-        self.combined_unknown = pd.merge(
-            left=self.combined, right=self.unknown, how='outer', left_index=True, right_index=True).fillna(0)
+
+        label_avg = int(np.average(list(dict(Counter(self.y)).values())))
+
+        tmp_unk = self.tmp_sink.multiply(alpha).apply(np.floor)
+        tmp_unk.columns = ["UNKNOWN_0"]
+        unk_init = tmp_unk
+        comb_unk = self.combined
+
+        unk_labs = ["UNKNOWN_0"]
+
+        for i in range(1, label_avg):
+            unk_lab = f"UNKNOWN_{i}"
+            unk_labs.append(unk_lab)
+            tmp = unk_init.apply(lambda x: int(np.random.normal(x, 0.1*x)), 1)
+            tmp = tmp.to_frame()
+            tmp.columns = [unk_lab]
+            tmp_unk = pd.merge(
+                left=tmp_unk, right=tmp, how='outer', left_index=True, right_index=True).fillna(0)
+
+        self.unk_labs = pd.Series(
+            data=['unknown']*len(unk_labs), index=unk_labs)
+        self.unk = tmp_unk
 
     def normalize(self, method):
         if method == 'RLE':
@@ -45,15 +59,15 @@ class sourceforest():
             self.normalized = normalize.subsample_normalize_pd(self.combined)
         elif method == 'CLR':
             self.normalized = normalize.CLR_normalize(self.combined)
-        self.normalized['UNKNOWN'] = self.combined_unknown['UNKNOWN']
+        self.normalized = pd.merge(left=self.normalized, right=self.unk,
+                                   how='outer', left_index=True, right_index=True).fillna(0)
         self.feat = self.normalized.drop(self.tmp_sink.columns, axis=1).T
         self.feat = self.feat.loc[:,
                                   self.feat.columns[self.feat.quantile(0.8, 0) > 0]]
-        self.feat.loc['UNKNOWN', :] = self.normalized['UNKNOWN']
-        self.sink = self.normalized.drop(self.source.columns, axis=1).T
+        self.sink = self.normalized.drop(
+            self.source.columns, axis=1).drop(self.unk.columns, axis=1).T
         self.sink = self.sink.loc[:, self.feat.columns]
-        self.sink = self.sink.drop('UNKNOWN', axis=0)
-        return(self.feat, self.sink)
+        self.y = self.y.append(self.unk_labs)
 
     def select_features(self, cv):
         clf = DecisionTreeClassifier()
