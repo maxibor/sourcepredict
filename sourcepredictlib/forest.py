@@ -8,6 +8,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import RFECV
 from sklearn.tree import DecisionTreeClassifier
 from sklearn import metrics
+from skbio.diversity import beta_diversity
+from skbio import TreeNode
+from ete3 import NCBITaxa
+from io import StringIO
+import umap
+
 from collections import Counter
 from . import normalize
 
@@ -62,12 +68,43 @@ class sourceforest():
         self.normalized = pd.merge(left=self.normalized, right=self.unk,
                                    how='outer', left_index=True, right_index=True).fillna(0)
         self.feat = self.normalized.drop(self.tmp_sink.columns, axis=1).T
-        self.feat = self.feat.loc[:,
-                                  self.feat.columns[self.feat.quantile(0.8, 0) > 0]]
+        # self.feat = self.feat.loc[:,self.feat.columns[self.feat.quantile(0.8, 0) > 0]]
         self.sink = self.normalized.drop(
             self.source.columns, axis=1).drop(self.unk.columns, axis=1).T
         self.sink = self.sink.loc[:, self.feat.columns]
         self.y = self.y.append(self.unk_labs)
+
+    def compute_distance(self, rank='genus'):
+        # Getting a single Taxonomic rank
+        ncbi = NCBITaxa()
+        only_rank = []
+        for i in list(self.normalized.index):
+            try:
+                if ncbi.get_rank([i])[i] == rank:
+                    only_rank.append(i)
+            except KeyError:
+                continue
+        self.normalized_rank = self.normalized.loc[only_rank, :]
+        tree = ncbi.get_topology(
+            list(self.normalized_rank.index), intermediate_nodes=False)
+        newick = TreeNode.read(StringIO(tree.write()))
+        wu = beta_diversity("weighted_unifrac", self.normalized_rank.T.as_matrix(), ids=list(
+            self.normalized_rank.columns), otu_ids=[str(i) for i in list(self.normalized_rank.index)], tree=newick)
+        self.wu = wu.to_data_frame()
+
+    def embed(self, n_comp=200):
+        my_umap = umap.UMAP(metric='precomputed',
+                            n_neighbors=30, min_dist=0.03, n_components=n_comp, n_epochs=500)
+        umap_embed_a = my_umap.fit(self.wu)
+        cols = [f"PC{i}" for i in range(1, n_comp+1)]
+        self.umap = pd.DataFrame(
+            umap_embed_a.embedding_, columns=cols, index=self.normalized_rank.columns)
+        self.feat = self.umap.drop(self.tmp_sink.columns, axis=0)
+        # tmp = self.feat
+        # tmp.loc[:, 'labs'] = self.y
+        # tmp.to_csv("tmp.csv")
+        self.sink = self.umap.drop(self.source.columns, axis=0).drop(
+            self.unk.columns, axis=0)
 
     def select_features(self, cv):
         clf = DecisionTreeClassifier()
@@ -87,7 +124,6 @@ class sourceforest():
 
         param_grid = {
             'n_estimators': [500, 1000],
-            'max_features': [None, 'sqrt', 'log2'],
             'max_depth': [4, 5, 6, 7, 8],
             'criterion': ['gini', 'entropy']
         }
@@ -99,7 +135,7 @@ class sourceforest():
         CV_rfc.fit(train_features, train_labels)
 
         rfc1 = RandomForestClassifier(
-            random_state=seed, max_features=CV_rfc.best_params_['max_features'], n_estimators=CV_rfc.best_params_['n_estimators'], max_depth=CV_rfc.best_params_['max_depth'], criterion=CV_rfc.best_params_['criterion'], class_weight="balanced", n_jobs=threads)
+            random_state=seed, max_features='auto', n_estimators=CV_rfc.best_params_['n_estimators'], max_depth=CV_rfc.best_params_['max_depth'], criterion=CV_rfc.best_params_['criterion'], class_weight="balanced", n_jobs=threads)
 
         print(
             f"Training classifier with best parameters on {threads} cores...")

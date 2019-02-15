@@ -57,8 +57,8 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     parser.add_argument(
         '-se',
         dest="seed",
-        default=None,
-        help="Seed for random generator. Default = None (randomly generated)")
+        default=42,
+        help="Seed for random generator. Default = 42")
     parser.add_argument(
         '-k',
         dest="kfold",
@@ -73,14 +73,14 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     args = parser.parse_args()
 
     sink = args.otu_table
-    alpha = args.alpha
+    alpha = float(args.alpha)
     normalization = args.normalization
     ratio = args.ratio
     sources = args.sources
     labels = args.labels
-    seed = args.seed
+    seed = int(args.seed)
     output = args.output
-    kfold = args.kfold
+    kfold = int(args.kfold)
     threads = int(args.threads)
 
     return(sink, alpha, normalization, sources, labels, ratio, seed, output, kfold, threads)
@@ -96,6 +96,8 @@ if __name__ == "__main__":
     a.add_unknown(alpha=ALPHA)
     a.normalize(method=NORMALIZATION)
     a.select_features(cv=KFOLD)
+    # a.compute_distance()
+    # a.embed()
     if OUTPUT is None:
         OUTPUT = f"{utils._get_basename(SINK)}.sourcepredict.csv"
     a.rndForest(seed=SEED, threads=THREADS, ratio=RATIO,
