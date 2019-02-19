@@ -3,10 +3,15 @@
 import sys
 import random
 import numpy as np
+import pandas as pd
 
 
 def print_class(classes, pred):
     [print(f'{i}:{j}') for i, j in zip(list(classes), list(pred[0, :]))]
+
+
+def class2dict(classes, pred):
+    return {c: p for (c, p) in zip(list(classes), list(pred[0, :]))}
 
 
 def print_ratio(classes, pred, ratio_orga):
@@ -18,6 +23,16 @@ def print_ratio(classes, pred, ratio_orga):
         if i != ratio_orga.upper():
             denom += pred_class[i]
     print(f"LogRatio {ratio_orga}/others = {np.log(num/denom)}")
+
+
+def split_sinks(sink):
+    sink_df = pd.read_csv(sink, index_col=0)
+    sinks = []
+    for i in sink_df.columns:
+        tmp = pd.DataFrame(
+            data=sink_df.loc[:, i], index=sink_df.index, columns=[i])
+        sinks.append(tmp)
+    return(sinks)
 
 
 def check_norm(method):

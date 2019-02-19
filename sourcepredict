@@ -4,7 +4,9 @@ import argparse
 from sourcepredictlib.forest import sourceforest
 from sourcepredictlib import utils
 import os
+import pandas as pd
 import warnings
+from . import utils
 
 
 def _get_args():
@@ -32,13 +34,13 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         dest="sources",
         default=os.path.dirname(os.path.abspath(
             __file__))+'/data/sourcepredict_sources.csv',
-        help="Path to source csv file. Default = data/sourcepredict_sources.csv")
+        help="Path to source csv file. Default = data/modern_gut_microbiomes_sources.csv")
     parser.add_argument(
         '-l',
         dest="labels",
         default=os.path.dirname(os.path.abspath(
             __file__)) + '/data/sourcepredict_labels.csv',
-        help="Path to labels csv file. Default = data/sourcepredict_labels.csv")
+        help="Path to labels csv file. Default = data/modern_gut_microbiomes_labels.csv")
     parser.add_argument(
         '-r',
         dest="ratio",
@@ -92,13 +94,24 @@ if __name__ == "__main__":
     SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, RATIO, SEED, OUTPUT, KFOLD, THREADS = _get_args()
     SEED = utils.check_gen_seed(SEED)
     NORMALIZATION = utils.check_norm(NORMALIZATION)
-    a = sourceforest(source=SOURCES, sink=SINK, labels=LABELS)
-    a.add_unknown(alpha=ALPHA)
-    a.normalize(method=NORMALIZATION)
-    a.select_features(cv=KFOLD)
-    # a.compute_distance()
-    # a.embed()
-    if OUTPUT is None:
-        OUTPUT = f"{utils._get_basename(SINK)}.sourcepredict.csv"
-    a.rndForest(seed=SEED, threads=THREADS, ratio=RATIO,
-                outfile=OUTPUT, kfold=KFOLD)
+    sinks = utils.split_sinks(SINK)
+    predictions = {}
+    for s in sinks:
+        a = sourceforest(source=SOURCES, sink=s, labels=LABELS)
+        print("adding unknown")
+        a.add_unknown(alpha=ALPHA)
+        print("normalizing")
+        a.normalize(method=NORMALIZATION)
+        print("feature engineering")
+        # a.dim_reduction(20)
+        a.select_features(cv=KFOLD, quantile=0.20, threads=THREADS)
+        # a.compute_distance()
+        # a.embed(n_comp=2)
+
+        print("machine learning")
+        prediction = a.rndForest(seed=SEED, threads=THREADS, ratio=RATIO,
+                                 outfile=OUTPUT, kfold=KFOLD)
+        predictions["".join(list(s.columns))] = prediction
+if OUTPUT is None:
+    OUTPUT = f"{utils._get_basename(SINK)}.sourcepredict.csv"
+pd.DataFrame(predictions).to_csv(OUTPUT)
