@@ -16,6 +16,6 @@ install:
 
   # Replace dep1 dep2 ... with your dependencies
   - conda env create -f conda_env.yaml
-  - conda activate sourcepredict
+  - source activate sourcepredict
 script: 
   - python sourcepredict ./data/test/dog_test_sample.csv
