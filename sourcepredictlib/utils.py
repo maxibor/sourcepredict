@@ -11,7 +11,14 @@ def print_class(classes, pred):
 
 
 def class2dict(classes, pred):
-    return {c: p for (c, p) in zip(list(classes), list(pred[0, :]))}
+    return {c: float(p) for (c, p) in zip(list(classes), list(pred[0, :]))}
+
+
+def account_unk(predicted_unk, predicted_source):
+    prop_known = predicted_unk['known']
+    res = {k: v*prop_known for (k, v) in predicted_source.items()}
+    res['unknown'] = predicted_unk['unknown']
+    return(res)
 
 
 def print_ratio(classes, pred, ratio_orga):

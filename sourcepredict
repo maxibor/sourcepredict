@@ -96,21 +96,31 @@ if __name__ == "__main__":
     NORMALIZATION = utils.check_norm(NORMALIZATION)
     sinks = utils.split_sinks(SINK)
     predictions = {}
+    unifrac_rank = "species"
     for s in sinks:
+        print(f"Sample: {''.join(list(s.columns))}")
+        print("Step 1: Checking for unknown proportion")
         a = sourceforest(source=SOURCES, sink=s, labels=LABELS)
-        print("adding unknown")
+        print("Adding unknown")
         a.add_unknown(alpha=ALPHA)
-        print("normalizing")
+        print("Normalizing")
         a.normalize(method=NORMALIZATION)
-        print("feature engineering")
-        # a.dim_reduction(20)
-        a.select_features(cv=KFOLD, quantile=0.20, threads=THREADS)
-        # a.compute_distance()
-        # a.embed(n_comp=2)
+        print("Feature engineering")
+        a.dim_reduction(20)
+        # a.select_features(cv=KFOLD, quantile=0.20, threads=THREADS)
+        print("Machine learning")
+        predicted_unk = a.rndForest(seed=SEED, threads=THREADS, ratio=RATIO,
+                                    outfile=OUTPUT, kfold=KFOLD)
 
-        print("machine learning")
-        prediction = a.rndForest(seed=SEED, threads=THREADS, ratio=RATIO,
-                                 outfile=OUTPUT, kfold=KFOLD)
+        print("Step 2: Checking for sample proportion")
+        print(f"Computing weighted unifrac distance on {unifrac_rank} rank")
+        a.compute_distance(rank=unifrac_rank)
+        a.embed(n_comp=2)
+        predicted_source = a.knn_classification(
+            kfold=KFOLD, threads=THREADS, seed=SEED)
+        print("==============\n")
+
+        prediction = utils.account_unk(predicted_unk, predicted_source)
         predictions["".join(list(s.columns))] = prediction
 if OUTPUT is None:
     OUTPUT = f"{utils._get_basename(SINK)}.sourcepredict.csv"
