@@ -111,7 +111,7 @@ class sourceforest():
 
         # mychart.save('/Users/borry/Documents/GitHub/sourcepredict/pca.html')
 
-    def rndForest(self, seed, threads, ratio, outfile, kfold):
+    def rndForest(self, seed, threads, outfile, kfold):
         train_features, test_features, train_labels, test_labels = train_test_split(
             self.feat_unk.drop('label', axis=1), self.feat_unk.loc[:, 'label'], test_size=0.2, random_state=seed)
 

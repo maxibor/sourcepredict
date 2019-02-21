@@ -33,13 +33,13 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         '-s',
         dest="sources",
         default=os.path.dirname(os.path.abspath(
-            __file__))+'/data/sourcepredict_sources.csv',
+            __file__))+'/data/modern_gut_microbiomes_sources.csv',
         help="Path to source csv file. Default = data/modern_gut_microbiomes_sources.csv")
     parser.add_argument(
         '-l',
         dest="labels",
         default=os.path.dirname(os.path.abspath(
-            __file__)) + '/data/sourcepredict_labels.csv',
+            __file__)) + '/data/modern_gut_microbiomes_labels.csv',
         help="Path to labels csv file. Default = data/modern_gut_microbiomes_labels.csv")
     parser.add_argument(
         '-n',
@@ -103,7 +103,7 @@ if __name__ == "__main__":
         a.dim_reduction(20)
         # a.select_features(cv=KFOLD, quantile=0.20, threads=THREADS)
         print("Machine learning")
-        predicted_unk = a.rndForest(seed=SEED, threads=THREADS, ratio=RATIO,
+        predicted_unk = a.rndForest(seed=SEED, threads=THREADS,
                                     outfile=OUTPUT, kfold=KFOLD)
 
         print("Step 2: Checking for sample proportion")
