@@ -1,6 +1,6 @@
 package:
   name: sourcepredict
-  version: "0.1.1"
+  version: "0.2"
 
 source:
   path: ../
@@ -11,7 +11,9 @@ requirements:
     - numpy
     - pandas
     - scikit-learn
-
+    - scikit-bio
+    - umap-learn
+    - ete3
 
 test:
   source_files:

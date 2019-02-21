@@ -89,7 +89,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
 
 
 if __name__ == "__main__":
-    version = "0.1.1"
+    version = "0.2"
     warnings.filterwarnings("ignore")
     SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, OUTPUT, UMAP_CSV, KFOLD, THREADS = _get_args()
     SEED = utils.check_gen_seed(SEED)
@@ -98,27 +98,29 @@ if __name__ == "__main__":
     predictions = {}
     unifrac_rank = "species"
     for s in sinks:
-        print(f"Sample: {''.join(list(s.columns))}")
+        print(f"== Sample: {''.join(list(s.columns))} ==")
         print("Step 1: Checking for unknown proportion")
         a = sourceforest(source=SOURCES, sink=s, labels=LABELS)
-        print("Adding unknown")
+        print("\tAdding unknown")
         a.add_unknown(alpha=ALPHA)
-        print("Normalizing")
+        print("\tNormalizing")
         a.normalize(method=NORMALIZATION)
-        print("Feature engineering")
+        print("\tFeature engineering")
         a.dim_reduction(20)
         # a.select_features(cv=KFOLD, quantile=0.20, threads=THREADS)
-        print("Machine learning")
+        print("\tRandom forest machine learning")
         predicted_unk = a.rndForest(seed=SEED, threads=THREADS,
                                     outfile=OUTPUT, kfold=KFOLD)
 
-        print("Step 2: Checking for sample proportion")
-        print(f"Computing weighted unifrac distance on {unifrac_rank} rank")
+        print("Step 2: Checking for source proportion")
+        print(f"\tComputing weighted unifrac distance on {unifrac_rank} rank")
         a.compute_distance(rank=unifrac_rank)
+        print("\tUMAP embedding")
         a.embed(n_comp=2, umap_csv=UMAP_CSV)
+        print("\tKNN machine learning")
         predicted_source = a.knn_classification(
             kfold=KFOLD, threads=THREADS, seed=SEED)
-        print("==============\n")
+        print("============================\n")
 
         prediction = utils.account_unk(predicted_unk, predicted_source)
         predictions["".join(list(s.columns))] = prediction
