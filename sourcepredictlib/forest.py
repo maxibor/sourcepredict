@@ -169,7 +169,7 @@ class sourceforest():
             self.normalized_rank.columns), otu_ids=[str(i) for i in list(self.normalized_rank.index)], tree=newick)
         self.wu = wu.to_data_frame()
 
-    def embed(self, n_comp=200):
+    def embed(self, umap_csv, n_comp=200):
         my_umap = umap.UMAP(metric='precomputed',
                             n_neighbors=30, min_dist=0.03, n_components=n_comp, n_epochs=500)
         umap_embed_a = my_umap.fit(self.wu)
@@ -177,6 +177,14 @@ class sourceforest():
         self.umap = pd.DataFrame(
             umap_embed_a.embedding_, columns=cols, index=self.normalized_rank.columns)
 
+        if umap_csv:
+            to_write = self.umap.copy(deep=True)
+            y = self.y.copy(deep=True)
+            y = y.append(
+                pd.Series(data=['sink']*len(list(self.tmp_sink.columns)), index=self.tmp_sink.columns))
+            to_write['label'] = y
+            to_write['name'] = to_write.index
+            to_write.to_csv(umap_csv)
         # to_plot = self.umap.copy()
         # to_plot['name'] = self.umap.index
         # to_plot['label'] = self.y
