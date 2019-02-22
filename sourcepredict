@@ -47,6 +47,18 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         default='RLE',
         help="Normalization method (RLE | CLR | Subsample). Default = RLE")
     parser.add_argument(
+        '-p',
+        dest="pca_dim",
+        default=20,
+        help="Number of PCA components to retain for dimension reduction"
+    )
+    parser.add_argument(
+        '-u',
+        dest="umap_dim",
+        default=2,
+        help="Number of UMAP dimensions to retain for dimension reduction"
+    )
+    parser.add_argument(
         '-o',
         dest="output",
         default=None,
@@ -75,17 +87,19 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     sources = args.sources
     labels = args.labels
     seed = int(args.seed)
+    pdim = int(args.pca_dim)
+    udim = int(args.umap_dim)
     output = args.output
     kfold = int(args.kfold)
     threads = int(args.threads)
 
-    return(sink, alpha, normalization, sources, labels, seed, output, kfold, threads)
+    return(sink, alpha, normalization, sources, labels, seed, pdim, udim, output, kfold, threads)
 
 
 if __name__ == "__main__":
     version = "0.1.1"
     warnings.filterwarnings("ignore")
-    SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, OUTPUT, KFOLD, THREADS = _get_args()
+    SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, PDIM, UDIM, OUTPUT, KFOLD, THREADS = _get_args()
     SEED = utils.check_gen_seed(SEED)
     NORMALIZATION = utils.check_norm(NORMALIZATION)
     sinks = utils.split_sinks(SINK)
@@ -100,7 +114,7 @@ if __name__ == "__main__":
         print("Normalizing")
         a.normalize(method=NORMALIZATION)
         print("Feature engineering")
-        a.dim_reduction(20)
+        a.dim_reduction(PDIM)
         # a.select_features(cv=KFOLD, quantile=0.20, threads=THREADS)
         print("Machine learning")
         predicted_unk = a.rndForest(seed=SEED, threads=THREADS, ratio=RATIO,
@@ -109,7 +123,7 @@ if __name__ == "__main__":
         print("Step 2: Checking for sample proportion")
         print(f"Computing weighted unifrac distance on {unifrac_rank} rank")
         a.compute_distance(rank=unifrac_rank)
-        a.embed(n_comp=2)
+        a.embed(n_comp=UDIM)
         predicted_source = a.knn_classification(
             kfold=KFOLD, threads=THREADS, seed=SEED)
         print("==============\n")
