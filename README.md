@@ -7,35 +7,50 @@ Prediction/source tracking of sample source using a random forest approach
 ## Installation
 
 ```
-$ conda install -c maxibor sourcepredict
+$ conda install -c etetoolkit -c bioconda -c maxibor sourcepredict
 ```
 
 ## Example
 
 ```bash
-$ sourcepredict -r canis_familiaris ./data/test/dog_test_sample.csv
-Performing 3 fold cross validation on 2 cores...
-Training classifier with best parameters on 2 cores...
-Training Accuracy: 1.0
-=================
-Canis_familiaris:0.9058876469899879
-Homo_sapiens:0.00920415762430391
-Sus_scrofa:0.0003424958927924832
-UNKNOWN:0.08456569949291566
-LogRatio canis_familiaris/others = 2.2644259750872995
+$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv?token=AIOyNX-Styi0FWlY-9ZILyGbh8EpEYmDks5cd_k4wA%3D%3D -O dog_test_sample.csv
+$ sourcepredict dog_test_sample.csv
+== Sample: ERR1915662 ==
+Step 1: Checking for unknown proportion
+	Adding unknown
+	Normalizing
+	Feature engineering
+	Random forest machine learning
+	Performing 3 fold cross validation on 2 cores...
+	Training random forest classifier with best parameters on 2 cores...
+	-> Testing Accuracy: 1.0
+	----------------------
+	- Unknown: 0.0%
+Step 2: Checking for source proportion
+	Computing weighted unifrac distance on species rank
+	UMAP embedding
+	KNN machine learning
+	Performing 3 fold cross validation on 2 cores...
+	-> Testing Accuracy: 1.0
+	----------------------
+	- Canis_familiaris:1.0
+	- Homo_sapiens:0.0
+	- Sus_scrofa:0.0
+============================
 ```
 
 ## Help
 
 ```
 $ sourcepredict -h
-usage: SourcePredict v0.1.1 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
-                            [-r RATIO] [-n NORMALIZATION] [-o OUTPUT]
-                            [-se SEED] [-k KFOLD] [-t THREADS]
-                            otu_table
+usage: SourcePredict v0.21 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
+                           [-n NORMALIZATION] [-pd PCA_DIM] [-ud UMAP_DIM]
+                           [-o OUTPUT] [-u UMAP] [-se SEED] [-k KFOLD]
+                           [-t THREADS]
+                           otu_table
 
 ==========================================================
-SourcePredict v0.1.1
+SourcePredict v0.21
 Coprolite source classification
 Author: Maxime Borry
 Contact: <borry[at]shh.mpg.de>
@@ -50,17 +65,18 @@ optional arguments:
   -h, --help        show this help message and exit
   -a ALPHA          Proportion of sink sample in unknown. Default = 0.1
   -s SOURCES        Path to source csv file. Default =
-                    data/sourcepredict_sources.csv
+                    data/modern_gut_microbiomes_sources.csv
   -l LABELS         Path to labels csv file. Default =
-                    data/sourcepredict_labels.csv
-  -r RATIO          Target organism for ratio calculation. Default =
-                    'Homo_sapiens'
+                    data/modern_gut_microbiomes_labels.csv
   -n NORMALIZATION  Normalization method (RLE | CLR | Subsample). Default =
                     RLE
+  -pd PCA_DIM       Number of PCA components to retain for dimension reduction
+  -ud UMAP_DIM      Number of UMAP dimensions to retain for dimension
+                    reduction
   -o OUTPUT         Output file basename. Default =
                     <sample_basename>.sourcepredict.csv
-  -se SEED          Seed for random generator. Default = None (randomly
-                    generated)
+  -u UMAP           Umap embedding csv file. Default = None
+  -se SEED          Seed for random generator. Default = 42
   -k KFOLD          Number of fold for K-fold cross validation in feature
                     selection and parameter optimization. Default = 3
   -t THREADS        Number of threads for parallel processing. Default = 2
@@ -68,9 +84,9 @@ optional arguments:
 
 ## Sourcepredict source file
 
-- The sources were obtained with the [Kraken based pipeline](utils/kraken_pipeline/kraken_pipe.nf) included in this repository, using the [*Dustmasked MiniKraken DB 4GB*](https://ccb.jhu.edu/software/kraken/dl/minikraken_20171101_4GB_dustmasked.tgz).  
-- The source file is here [data/sourcepredict_sources.csv](data/sourcepredict_sources.csv)
-- The label file for this source file is here [data/sourcepredict_labels.csv](data/sourcepredict_labels.csv)
+- The sources were obtained with the [Kraken based pipeline](utils/kraken_pipeline/kraken_pipe.nf) included in this repository, using the [*MiniKraken2_v2_8GB*](https://ccb.jhu.edu/software/kraken2/dl/minikraken2_v2_8GB.tgz).  
+- The default source file is here [data/modern_gut_microbiomes_sources.csv](data/modern_gut_microbiomes_sources.csv)
+- The label file for this source file is here [data/modern_gut_microbiomes_sources.csv](data/modern_gut_microbiomes_labels.csv)
 
 
 ### Current species included in the source file

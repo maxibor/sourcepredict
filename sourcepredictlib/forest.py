@@ -15,7 +15,7 @@ from skbio import TreeNode
 from ete3 import NCBITaxa
 from io import StringIO
 import umap
-import altair as alt
+# import altair as alt
 
 from collections import Counter
 from . import normalize
@@ -111,7 +111,7 @@ class sourceforest():
 
         # mychart.save('/Users/borry/Documents/GitHub/sourcepredict/pca.html')
 
-    def rndForest(self, seed, threads, ratio, outfile, kfold):
+    def rndForest(self, seed, threads, outfile, kfold):
         train_features, test_features, train_labels, test_labels = train_test_split(
             self.feat_unk.drop('label', axis=1), self.feat_unk.loc[:, 'label'], test_size=0.2, random_state=seed)
 
@@ -127,7 +127,7 @@ class sourceforest():
             estimator=rfc, param_grid=param_rf_grid, cv=kfold, n_jobs=threads)
 
         print(
-            f"Performing {kfold} fold cross validation on {threads} cores...")
+            f"\tPerforming {kfold} fold cross validation on {threads} cores...")
         CV_rfc.fit(train_features, train_labels)
 
         rfc1 = RandomForestClassifier(
@@ -140,15 +140,16 @@ class sourceforest():
             n_jobs=threads)
 
         print(
-            f"Training classifier with best parameters on {threads} cores...")
+            f"\tTraining random forest classifier with best parameters on {threads} cores...")
         rfc1.fit(train_features, train_labels)
         y_pred = rfc1.predict(test_features)
-        print("Testing Accuracy:", metrics.accuracy_score(
+        print("\t-> Testing Accuracy:", metrics.accuracy_score(
             test_labels, y_pred))
         self.sink_pred_unk = rfc1.predict_proba(self.sink_unk)
         predictions = utils.class2dict(
             classes=rfc1.classes_, pred=self.sink_pred_unk)
-        print(f"Unknown: {predictions['unknown']*100}%")
+        print(
+            f"\t----------------------\n\t- Unknown: {predictions['unknown']*100}%")
         return(predictions)
 
     def compute_distance(self, rank='species'):
@@ -169,7 +170,7 @@ class sourceforest():
             self.normalized_rank.columns), otu_ids=[str(i) for i in list(self.normalized_rank.index)], tree=newick)
         self.wu = wu.to_data_frame()
 
-    def embed(self, n_comp=200):
+    def embed(self, umap_csv, n_comp=200):
         my_umap = umap.UMAP(metric='precomputed',
                             n_neighbors=30, min_dist=0.03, n_components=n_comp, n_epochs=500)
         umap_embed_a = my_umap.fit(self.wu)
@@ -177,18 +178,24 @@ class sourceforest():
         self.umap = pd.DataFrame(
             umap_embed_a.embedding_, columns=cols, index=self.normalized_rank.columns)
 
-        # to_plot = self.umap.copy()
-        # to_plot['name'] = self.umap.index
-        # to_plot['label'] = self.y
+        if umap_csv:
+            to_write = self.umap.copy(deep=True)
+            y = self.y.copy(deep=True)
+            y = y.append(
+                pd.Series(data=['sink']*len(list(self.tmp_sink.columns)), index=self.tmp_sink.columns))
+            to_write['label'] = y
+            to_write['name'] = to_write.index
+            to_write.to_csv(umap_csv)
 
-        # mychart = alt.Chart(to_plot).mark_circle(size=60).encode(
-        #     x='PC1',
-        #     y='PC2',
-        #     color='label',
-        #     tooltip=['label', 'name']
-        # ).interactive()
+            # mychart = alt.Chart(to_write).mark_circle(size=60).encode(
+            #     x='PC1',
+            #     y='PC2',
+            #     color='label',
+            #     tooltip=['label', 'name']
+            # ).interactive()
 
-        # mychart.save('/Users/borry/Documents/GitHub/sourcepredict/umap.html')
+            # mychart.save(
+            #     '/Users/borry/Documents/GitHub/sourcepredict/umap.html')
 
         self.feat = self.umap.drop(self.tmp_sink.columns, axis=0)
         self.feat['label'] = self.y
@@ -207,7 +214,8 @@ class sourceforest():
         CV_knn = GridSearchCV(
             estimator=knn, param_grid=param_knn_grid, cv=kfold, n_jobs=threads)
 
-        print(f"Performing {kfold} fold cross validation on {threads} cores...")
+        print(
+            f"\tPerforming {kfold} fold cross validation on {threads} cores...")
         CV_knn.fit(train_features, train_labels)
 
         knn1 = KNeighborsClassifier(
@@ -215,8 +223,8 @@ class sourceforest():
 
         knn1.fit(train_features, train_labels)
         y_pred = knn1.predict(test_features)
-        print("Testing Accuracy:", metrics.accuracy_score(
-            test_labels, y_pred), "\n=================")
+        print("\t-> Testing Accuracy:", metrics.accuracy_score(
+            test_labels, y_pred))
         self.sink_pred = knn1.predict_proba(self.sink)
         utils.print_class(classes=knn1.classes_, pred=self.sink_pred)
         predictions = utils.class2dict(
