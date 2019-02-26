@@ -152,17 +152,41 @@ class sourceforest():
             f"\t----------------------\n\t- Unknown: {predictions['unknown']*100}%")
         return(predictions)
 
+
+class sourcemap():
+    def __init__(self, train, test, test_labels, norm_method):
+        '''
+        train(pandas DataFrame) source otu table
+        test(pandas DataFrame) sink otu table
+        labels(list) train sample class
+        norm_method(str) normalization method
+        '''
+        self.train = pd.read_csv(train, index_col=0)
+        self.test = pd.read_csv(test, index_col=0)
+        combined = self.train.merge(
+            self.test, how='outer', left_index=True, right_index=True).fillna(0)
+        if norm_method == 'RLE':
+            self.combined = normalize.RLE_normalize(combined).T
+        elif norm_method == 'SUBSAMPLE':
+            self.combined = normalize.subsample_normalize_pd(combined).T
+        elif norm_method == 'CLR':
+            self.combined = normalize.CLR_normalize(combined).T
+        self.train_samples = list(train.columns)
+        self.test_samples = list(test.columns)
+        labels = pd.read_csv(labels, index_col=0)
+        self.labels = labels['labels']
+
     def compute_distance(self, rank='species'):
         # Getting a single Taxonomic rank
         ncbi = NCBITaxa()
         only_rank = []
-        for i in list(self.normalized.index):
+        for i in list(self.combined.index):
             try:
                 if ncbi.get_rank([i])[i] == rank:
                     only_rank.append(i)
             except KeyError:
                 continue
-        self.normalized_rank = self.normalized.loc[only_rank, :]
+        self.normalized_rank = self.combined.loc[only_rank, :]
         tree = ncbi.get_topology(
             list(self.normalized_rank.index), intermediate_nodes=False)
         newick = TreeNode.read(StringIO(tree.write()))
@@ -180,30 +204,20 @@ class sourceforest():
 
         if umap_csv:
             to_write = self.umap.copy(deep=True)
-            y = self.y.copy(deep=True)
+            y = self.labels.copy(deep=True)
             y = y.append(
-                pd.Series(data=['sink']*len(list(self.tmp_sink.columns)), index=self.tmp_sink.columns))
+                pd.Series(data=['sink']*len(list(self.test.index)), index=self.test.index))
             to_write['label'] = y
             to_write['name'] = to_write.index
             to_write.to_csv(umap_csv)
 
-            # mychart = alt.Chart(to_write).mark_circle(size=60).encode(
-            #     x='PC1',
-            #     y='PC2',
-            #     color='label',
-            #     tooltip=['label', 'name']
-            # ).interactive()
-
-            # mychart.save(
-            #     '/Users/borry/Documents/GitHub/sourcepredict/umap.html')
-
-        self.feat = self.umap.drop(self.tmp_sink.columns, axis=0)
-        self.feat['label'] = self.y
-        self.sink = self.umap.drop(self.source.columns, axis=0)
+        self.source = self.umap.drop(self.test_samples, axis=0)
+        self.source['label'] = self.labels
+        self.sink = self.umap.drop(self.train_samples, axis=0)
 
     def knn_classification(self, kfold, threads, seed):
         train_features, test_features, train_labels, test_labels = train_test_split(
-            self.feat.drop('label', axis=1), self.feat.loc[:, 'label'], test_size=0.2, random_state=seed)
+            self.source.drop('label', axis=1), self.source.loc[:, 'label'], test_size=0.2, random_state=seed)
         knn = KNeighborsClassifier(n_jobs=threads)
 
         param_knn_grid = {

@@ -2,6 +2,7 @@
 
 import argparse
 from sourcepredictlib.forest import sourceforest
+from sourcepredictlib.forest import sourcemap
 from sourcepredictlib import utils
 import os
 import pandas as pd
@@ -103,7 +104,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
 
 
 if __name__ == "__main__":
-    version = "0.2"
+    version = "0.21"
     warnings.filterwarnings("ignore")
     SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, PDIM, UDIM, OUTPUT, UMAP_CSV, KFOLD, THREADS = _get_args()
     SEED = utils.check_gen_seed(SEED)
@@ -111,6 +112,7 @@ if __name__ == "__main__":
     sinks = utils.split_sinks(SINK)
     predictions = {}
     unifrac_rank = "species"
+    samp_pred = {}
     for s in sinks:
         print(f"== Sample: {''.join(list(s.columns))} ==")
         print("Step 1: Checking for unknown proportion")
@@ -125,19 +127,23 @@ if __name__ == "__main__":
         print("\tRandom forest machine learning")
         predicted_unk = a.rndForest(seed=SEED, threads=THREADS,
                                     outfile=OUTPUT, kfold=KFOLD)
+        samp_pred[''.join(list(s.columns))] = {
+            'unknown': predicted_unk['unknown']}
 
-        print("Step 2: Checking for source proportion")
-        print(f"\tComputing weighted unifrac distance on {unifrac_rank} rank")
-        a.compute_distance(rank=unifrac_rank)
-        print("\tUMAP embedding")
-        a.embed(n_comp=UDIM, umap_csv=UMAP_CSV)
-        print("\tKNN machine learning")
-        predicted_source = a.knn_classification(
-            kfold=KFOLD, threads=THREADS, seed=SEED)
-        print("============================\n")
+    print("Step 2: Checking for source proportion")
+    u = sourcemap(train=SOURCES, test=SINK, test_labels=LABELS,
+                  norm_method=NORMALIZATION)
+    print(f"\tComputing weighted unifrac distance on {unifrac_rank} rank")
+    u.compute_distance(rank=unifrac_rank)
+    print("\tUMAP embedding")
+    u.embed(n_comp=UDIM, umap_csv=UMAP_CSV)
+    print("\tKNN machine learning")
+    predicted_source = u.knn_classification(
+        kfold=KFOLD, threads=THREADS, seed=SEED)
+    print("============================\n")
 
-        prediction = utils.account_unk(predicted_unk, predicted_source)
-        predictions["".join(list(s.columns))] = prediction
+    prediction = utils.account_unk(predicted_unk, predicted_source)
+    predictions["".join(list(s.columns))] = prediction
 if OUTPUT is None:
     OUTPUT = f"{utils._get_basename(SINK)}.sourcepredict.csv"
 pd.DataFrame(predictions).to_csv(OUTPUT)
