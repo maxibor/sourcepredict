@@ -98,19 +98,6 @@ class sourceforest():
         self.sink_unk = self.pcaed.drop(self.source.columns, axis=0).drop(
             self.unk.columns, axis=0)
 
-        # to_plot = self.pcaed.copy()
-        # to_plot['name'] = self.pcaed.index
-        # to_plot['label'] = self.y
-
-        # mychart = alt.Chart(to_plot).mark_circle(size=60).encode(
-        #     x='PC1',
-        #     y='PC2',
-        #     color='label',
-        #     tooltip=['label', 'name']
-        # ).interactive()
-
-        # mychart.save('/Users/borry/Documents/GitHub/sourcepredict/pca.html')
-
     def rndForest(self, seed, threads, outfile, kfold):
         train_features, test_features, train_labels, test_labels = train_test_split(
             self.feat_unk.drop('label', axis=1), self.feat_unk.loc[:, 'label'], test_size=0.2, random_state=seed)
@@ -146,15 +133,16 @@ class sourceforest():
         print("\t-> Testing Accuracy:", metrics.accuracy_score(
             test_labels, y_pred))
         self.sink_pred_unk = rfc1.predict_proba(self.sink_unk)
+        sample = [''.join(list(self.tmp_sink.columns))]
         predictions = utils.class2dict(
-            classes=rfc1.classes_, pred=self.sink_pred_unk)
+            samples=sample, classes=rfc1.classes_, pred=self.sink_pred_unk)
         print(
-            f"\t----------------------\n\t- Unknown: {predictions['unknown']*100}%")
+            f"\t----------------------\n\t- Unknown: {predictions[sample[0]]['unknown']*100}%")
         return(predictions)
 
 
 class sourcemap():
-    def __init__(self, train, test, test_labels, norm_method):
+    def __init__(self, train, test, labels, norm_method):
         '''
         train(pandas DataFrame) source otu table
         test(pandas DataFrame) sink otu table
@@ -171,8 +159,8 @@ class sourcemap():
             self.combined = normalize.subsample_normalize_pd(combined).T
         elif norm_method == 'CLR':
             self.combined = normalize.CLR_normalize(combined).T
-        self.train_samples = list(train.columns)
-        self.test_samples = list(test.columns)
+        self.train_samples = list(self.train.columns)
+        self.test_samples = list(self.test.columns)
         labels = pd.read_csv(labels, index_col=0)
         self.labels = labels['labels']
 
@@ -180,18 +168,18 @@ class sourcemap():
         # Getting a single Taxonomic rank
         ncbi = NCBITaxa()
         only_rank = []
-        for i in list(self.combined.index):
+        for i in list(self.combined.columns):
             try:
                 if ncbi.get_rank([i])[i] == rank:
                     only_rank.append(i)
             except KeyError:
                 continue
-        self.normalized_rank = self.combined.loc[only_rank, :]
+        self.normalized_rank = self.combined.loc[:, only_rank]
         tree = ncbi.get_topology(
-            list(self.normalized_rank.index), intermediate_nodes=False)
+            list(self.normalized_rank.columns), intermediate_nodes=False)
         newick = TreeNode.read(StringIO(tree.write()))
-        wu = beta_diversity("weighted_unifrac", self.normalized_rank.T.as_matrix().astype(int), ids=list(
-            self.normalized_rank.columns), otu_ids=[str(i) for i in list(self.normalized_rank.index)], tree=newick)
+        wu = beta_diversity("weighted_unifrac", self.normalized_rank.as_matrix().astype(int), ids=list(
+            self.normalized_rank.index), otu_ids=[str(i) for i in list(self.normalized_rank.columns)], tree=newick)
         self.wu = wu.to_data_frame()
 
     def embed(self, umap_csv, n_comp=200):
@@ -200,7 +188,7 @@ class sourcemap():
         umap_embed_a = my_umap.fit(self.wu)
         cols = [f"PC{i}" for i in range(1, n_comp+1)]
         self.umap = pd.DataFrame(
-            umap_embed_a.embedding_, columns=cols, index=self.normalized_rank.columns)
+            umap_embed_a.embedding_, columns=cols, index=self.normalized_rank.index)
 
         if umap_csv:
             to_write = self.umap.copy(deep=True)
@@ -240,7 +228,8 @@ class sourcemap():
         print("\t-> Testing Accuracy:", metrics.accuracy_score(
             test_labels, y_pred))
         self.sink_pred = knn1.predict_proba(self.sink)
-        utils.print_class(classes=knn1.classes_, pred=self.sink_pred)
+        utils.print_class(samples=self.sink.index,
+                          classes=knn1.classes_, pred=self.sink_pred)
         predictions = utils.class2dict(
-            classes=knn1.classes_, pred=self.sink_pred)
+            samples=self.sink.index, classes=knn1.classes_, pred=self.sink_pred)
         return(predictions)

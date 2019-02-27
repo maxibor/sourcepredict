@@ -113,9 +113,11 @@ if __name__ == "__main__":
     predictions = {}
     unifrac_rank = "species"
     samp_pred = {}
+    print("Step 1: Checking for unknown proportion")
     for s in sinks:
-        print(f"== Sample: {''.join(list(s.columns))} ==")
-        print("Step 1: Checking for unknown proportion")
+        sample = ''.join(list(s.columns))
+        samp_pred[sample] = {}
+        print(f"  == Sample: {sample} ==")
         a = sourceforest(source=SOURCES, sink=s, labels=LABELS)
         print("\tAdding unknown")
         a.add_unknown(alpha=ALPHA)
@@ -125,25 +127,23 @@ if __name__ == "__main__":
         a.dim_reduction(PDIM)
         # a.select_features(cv=KFOLD, quantile=0.20, threads=THREADS)
         print("\tRandom forest machine learning")
-        predicted_unk = a.rndForest(seed=SEED, threads=THREADS,
-                                    outfile=OUTPUT, kfold=KFOLD)
-        samp_pred[''.join(list(s.columns))] = {
-            'unknown': predicted_unk['unknown']}
+        pred = a.rndForest(seed=SEED, threads=THREADS,
+                           outfile=OUTPUT, kfold=KFOLD)
+        samp_pred[sample]['unknown'] = pred[sample]['unknown']
 
     print("Step 2: Checking for source proportion")
-    u = sourcemap(train=SOURCES, test=SINK, test_labels=LABELS,
+    u = sourcemap(train=SOURCES, test=SINK, labels=LABELS,
                   norm_method=NORMALIZATION)
     print(f"\tComputing weighted unifrac distance on {unifrac_rank} rank")
     u.compute_distance(rank=unifrac_rank)
     print("\tUMAP embedding")
     u.embed(n_comp=UDIM, umap_csv=UMAP_CSV)
     print("\tKNN machine learning")
-    predicted_source = u.knn_classification(
+    umap_pred = u.knn_classification(
         kfold=KFOLD, threads=THREADS, seed=SEED)
-    print("============================\n")
 
-    prediction = utils.account_unk(predicted_unk, predicted_source)
-    predictions["".join(list(s.columns))] = prediction
-if OUTPUT is None:
-    OUTPUT = f"{utils._get_basename(SINK)}.sourcepredict.csv"
-pd.DataFrame(predictions).to_csv(OUTPUT)
+    prediction = utils.account_unk(samp_pred=samp_pred, umap_pred=umap_pred)
+    if OUTPUT is None:
+        OUTPUT = f"{utils._get_basename(SINK)}.sourcepredict.csv"
+    prediction.to_csv(OUTPUT)
+    print(f"Sourcepredict result written to {OUTPUT}")

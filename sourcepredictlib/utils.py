@@ -6,20 +6,28 @@ import numpy as np
 import pandas as pd
 
 
-def print_class(classes, pred):
+def print_class(samples, classes, pred):
     print("\t----------------------")
-    [print(f'\t- {i}:{j}') for i, j in zip(list(classes), list(pred[0, :]))]
+    for i in range(0, len(samples)):
+        sample = samples[i]
+        print(f"\t- Sample: {sample}")
+        [print(f'\t\t {i}:{j}')
+         for i, j in zip(list(classes), list(pred[i, :]))]
 
 
-def class2dict(classes, pred):
-    return {c: float(p) for (c, p) in zip(list(classes), list(pred[0, :]))}
+def class2dict(samples, classes, pred):
+    resdict = {}
+    for i in range(0, len(samples)):
+        sample = samples[i]
+        resdict[sample] = {c: float(p) for (c, p) in zip(
+            list(classes), list(pred[i, :]))}
+    return(resdict)
 
 
-def account_unk(predicted_unk, predicted_source):
-    prop_known = predicted_unk['known']
-    res = {k: v*prop_known for (k, v) in predicted_source.items()}
-    res['unknown'] = predicted_unk['unknown']
-    return(res)
+def account_unk(samp_pred, umap_pred):
+    for akey in umap_pred:
+        umap_pred[akey]['unknown'] = samp_pred[akey]['unknown']
+    return(pd.DataFrame(umap_pred))
 
 
 def print_ratio(classes, pred, ratio_orga):
