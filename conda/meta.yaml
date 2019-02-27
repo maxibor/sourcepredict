@@ -1,6 +1,6 @@
 package:
   name: sourcepredict
-  version: "0.2.1"
+  version: "0.2.2"
 
 source:
   path: ../
@@ -24,4 +24,4 @@ test:
 about:
   home: https://github.com/maxibor/sourcepredict
   license: GPL-3.0
-  summary: 'Prediction/source tracking of sample source using a random forest approach'
+  summary: 'Prediction/source tracking of sample source using composite learning'
