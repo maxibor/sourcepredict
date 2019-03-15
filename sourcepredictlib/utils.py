@@ -26,6 +26,8 @@ def class2dict(samples, classes, pred):
 
 def account_unk(samp_pred, umap_pred):
     for akey in umap_pred:
+        umap_pred[akey] = {k: umap_pred[akey][k] *
+                           (1 - samp_pred[akey]['unknown']) for k in umap_pred[akey]}
         umap_pred[akey]['unknown'] = samp_pred[akey]['unknown']
     return(pd.DataFrame(umap_pred))
 
@@ -52,10 +54,20 @@ def split_sinks(sink):
 
 
 def check_norm(method):
-    methods = ['RLE', 'CLR', 'SUBSAMPLE']
+    methods = ['RLE', 'CLR', 'SUBSAMPLE', 'GMPR']
     method = method.upper()
     if method not in methods:
         print("Please check the normalization method (RLE or Subsample)")
+        sys.exit(1)
+    else:
+        return(method)
+
+
+def check_embed(method):
+    methods = ['TSNE', 'UMAP']
+    method = method.upper()
+    if method not in methods:
+        print(f"Please check the embedding method ({' or '.join(methods)})")
         sys.exit(1)
     else:
         return(method)

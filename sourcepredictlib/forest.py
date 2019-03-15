@@ -9,12 +9,15 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import RFECV
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
 from sklearn import metrics
 from skbio.diversity import beta_diversity
 from skbio import TreeNode
 from ete3 import NCBITaxa
 from io import StringIO
 import umap
+import warnings
+import sys
 # import altair as alt
 
 from collections import Counter
@@ -38,8 +41,9 @@ class sourceforest():
     def __repr__(self):
         return(f'A sourceforest object of source {self.source} and sink {self.tmp_sink}')
 
-    def add_unknown(self, alpha):
+    def add_unknown(self, alpha, seed):
 
+        np.random.seed = seed
         label_avg = int(np.average(list(dict(Counter(self.y)).values())))
 
         tmp_unk = self.tmp_sink.multiply(alpha).apply(np.floor)
@@ -60,23 +64,32 @@ class sourceforest():
         self.unk_labs = pd.Series(
             data=['unknown']*len(unk_labs), index=unk_labs)
 
-    def normalize(self, method):
+    def normalize(self, method, threads):
         if method == 'RLE':
             self.normalized = normalize.RLE_normalize(self.combined)
         elif method == 'SUBSAMPLE':
             self.normalized = normalize.subsample_normalize_pd(self.combined)
         elif method == 'CLR':
             self.normalized = normalize.CLR_normalize(self.combined)
+        elif method == 'GMPR':
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", RuntimeWarning)
+                self.normalized = normalize.GMPR_normalize(
+                    self.combined, threads)
         self.normalized_unk = pd.merge(left=self.normalized, right=self.unk,
                                        how='outer', left_index=True, right_index=True).fillna(0)
         # self.feat_unk = self.normalized.drop(self.tmp_sink.columns, axis=1).T
-        self.sink = self.normalized.drop(
-            self.source.columns, axis=1).T
+        try:
+            self.sink = self.normalized.drop(
+                self.source.columns, axis=1).T
+        except KeyError:
+            print(f"ERROR: Test sample present in training dataset")
+            sys.exit(1)
         # self.sink = self.sink.loc[:, self.normalized.index]
         self.y_unk = self.y_unk.append(self.unk_labs)
 
-    def select_features(self, cv, quantile, threads):
-        clf = DecisionTreeClassifier()
+    def select_features(self, cv, quantile, seed, threads):
+        clf = DecisionTreeClassifier(random_state=seed)
         trans = RFECV(clf, cv=cv, n_jobs=threads)
         d = self.feat
         d = d.loc[:, d.columns[d.quantile(quantile, 0) > 0]]
@@ -105,9 +118,8 @@ class sourceforest():
         rfc = RandomForestClassifier(random_state=seed, n_jobs=threads)
 
         param_rf_grid = {
-            'n_estimators': [500, 1000],
-            'max_depth': [4, 5, 6, 7, 8],
-            'criterion': ['gini', 'entropy']
+            'n_estimators': [10, 50, 100],
+            'max_depth': [2, 4, 6]
         }
 
         CV_rfc = GridSearchCV(
@@ -122,7 +134,7 @@ class sourceforest():
             max_features='auto',
             n_estimators=CV_rfc.best_params_['n_estimators'],
             max_depth=CV_rfc.best_params_['max_depth'],
-            criterion=CV_rfc.best_params_['criterion'],
+            criterion='gini',
             class_weight="balanced",
             n_jobs=threads)
 
@@ -130,19 +142,19 @@ class sourceforest():
             f"\tTraining random forest classifier with best parameters on {threads} cores...")
         rfc1.fit(train_features, train_labels)
         y_pred = rfc1.predict(test_features)
-        print("\t-> Testing Accuracy:", metrics.accuracy_score(
-            test_labels, y_pred))
+        print("\t-> Testing Accuracy:", round(metrics.accuracy_score(
+            test_labels, y_pred), 2))
         self.sink_pred_unk = rfc1.predict_proba(self.sink_unk)
         sample = [''.join(list(self.tmp_sink.columns))]
         predictions = utils.class2dict(
             samples=sample, classes=rfc1.classes_, pred=self.sink_pred_unk)
         print(
-            f"\t----------------------\n\t- Unknown: {predictions[sample[0]]['unknown']*100}%")
+            f"\t----------------------\n\t- Unknown: {round(predictions[sample[0]]['unknown']*100, 2)}%")
         return(predictions)
 
 
 class sourcemap():
-    def __init__(self, train, test, labels, norm_method):
+    def __init__(self, train, test, labels, norm_method, threads=4):
         '''
         train(pandas DataFrame) source otu table
         test(pandas DataFrame) sink otu table
@@ -159,10 +171,14 @@ class sourcemap():
             self.combined = normalize.subsample_normalize_pd(combined).T
         elif norm_method == 'CLR':
             self.combined = normalize.CLR_normalize(combined).T
+        elif norm_method == 'GMPR':
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", RuntimeWarning)
+                self.combined = normalize.GMPR_normalize(combined, threads).T
         self.train_samples = list(self.train.columns)
         self.test_samples = list(self.test.columns)
         labels = pd.read_csv(labels, index_col=0)
-        self.labels = labels['labels']
+        self.labels = labels.loc[self.train.columns, 'labels']
 
     def compute_distance(self, rank='species'):
         # Getting a single Taxonomic rank
@@ -182,34 +198,43 @@ class sourcemap():
             self.normalized_rank.index), otu_ids=[str(i) for i in list(self.normalized_rank.columns)], tree=newick)
         self.wu = wu.to_data_frame()
 
-    def embed(self, umap_csv, n_comp=200):
-        my_umap = umap.UMAP(metric='precomputed',
-                            n_neighbors=30, min_dist=0.03, n_components=n_comp, n_epochs=500)
-        umap_embed_a = my_umap.fit(self.wu)
-        cols = [f"PC{i}" for i in range(1, n_comp+1)]
-        self.umap = pd.DataFrame(
-            umap_embed_a.embedding_, columns=cols, index=self.normalized_rank.index)
+    def embed(self, method, out_csv, seed, n_comp=200):
 
-        if umap_csv:
-            to_write = self.umap.copy(deep=True)
+        cols = [f"PC{i}" for i in range(1, n_comp+1)]
+
+        if method == 'UMAP':
+            embed = umap.UMAP(metric='precomputed',
+                              n_neighbors=30, min_dist=0.03, n_components=n_comp, random_state=seed, n_epochs=500)
+            my_embed = embed.fit(self.wu)
+        else:
+            embed = TSNE(metric='precomputed',
+                         n_components=n_comp, random_state=seed)
+            my_embed = embed.fit(np.matrix(self.wu))
+
+        self.my_embed = pd.DataFrame(
+            my_embed.embedding_, columns=cols, index=self.wu.index)
+
+        if out_csv:
+            to_write = self.my_embed.copy(deep=True)
             y = self.labels.copy(deep=True)
             y = y.append(
                 pd.Series(data=['sink']*len(list(self.test.index)), index=self.test.index))
-            to_write['label'] = y
+            to_write = to_write.merge(y, left_index=True, right_index=True)
             to_write['name'] = to_write.index
-            to_write.to_csv(umap_csv)
+            to_write.to_csv(out_csv)
 
-        self.source = self.umap.drop(self.test_samples, axis=0)
-        self.source['label'] = self.labels
-        self.sink = self.umap.drop(self.train_samples, axis=0)
+        self.source = self.my_embed.drop(self.test_samples, axis=0)
+        self.source = self.source.merge(
+            self.labels, left_index=True, right_index=True)
+        self.sink = self.my_embed.drop(self.train_samples, axis=0)
 
     def knn_classification(self, kfold, threads, seed):
         train_features, test_features, train_labels, test_labels = train_test_split(
-            self.source.drop('label', axis=1), self.source.loc[:, 'label'], test_size=0.2, random_state=seed)
+            self.source.drop('labels', axis=1), self.source.loc[:, 'labels'], test_size=0.2, random_state=seed)
         knn = KNeighborsClassifier(n_jobs=threads)
 
         param_knn_grid = {
-            'n_neighbors': [3, 5, 10, 15, 20],
+            'n_neighbors': [3, 5, 10, 15, 20, 30],
             'weights': ['uniform', 'distance']
         }
 
@@ -225,8 +250,8 @@ class sourcemap():
 
         knn1.fit(train_features, train_labels)
         y_pred = knn1.predict(test_features)
-        print("\t-> Testing Accuracy:", metrics.accuracy_score(
-            test_labels, y_pred))
+        print("\t-> Testing Accuracy:", round(metrics.accuracy_score(
+            test_labels, y_pred), 2))
         self.sink_pred = knn1.predict_proba(self.sink)
         utils.print_class(samples=self.sink.index,
                           classes=knn1.classes_, pred=self.sink_pred)
