@@ -56,11 +56,22 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         help="Number of PCA components to retain for dimension reduction"
     )
     parser.add_argument(
+        '-dt',
+        dest="distance",
+        default='weighted_unifrac',
+        help="Distance method. (unweighted_unifrac | weighted_unifrac) Default = weighted_unifrac"
+    )
+    parser.add_argument(
         '-me',
         dest="method",
         default='TSNE',
         help="Embedding Method. TSNE or UMAP. Default = TSNE"
     )
+    parser.add_argument(
+        '-e',
+        dest="embed",
+        default=None,
+        help="Output embedding csv file. Default = None")
     parser.add_argument(
         '-di',
         dest="dim",
@@ -73,11 +84,6 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         default=None,
         help="Output file basename. Default = <sample_basename>.sourcepredict.csv")
     parser.add_argument(
-        '-e',
-        dest="embed",
-        default=None,
-        help="Output embedding csv file. Default = None")
-    parser.add_argument(
         '-se',
         dest="seed",
         default=42,
@@ -86,7 +92,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         '-k',
         dest="kfold",
         default=2,
-        help="Number of fold for K-fold cross validation in feature selection and parameter optimization. Default = 3")
+        help="Number of fold for K-fold cross validation in feature selection and parameter optimization. Default = 2")
     parser.add_argument(
         '-t',
         dest="threads",
@@ -101,6 +107,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     sources = args.sources
     labels = args.labels
     seed = int(args.seed)
+    distance = args.distance
     pdim = int(args.pca_dim)
     method = args.method
     dim = int(args.dim)
@@ -109,19 +116,20 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     kfold = int(args.kfold)
     threads = int(args.threads)
 
-    return(sink, alpha, normalization, sources, labels, seed, pdim, method, dim, output, embed, kfold, threads)
+    return(sink, alpha, normalization, sources, labels, seed, pdim, distance, method, dim, output, embed, kfold, threads)
 
 
 if __name__ == "__main__":
-    version = "0.21"
+    version = "0.3"
     warnings.filterwarnings("ignore")
-    SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, PDIM, METHOD, DIM, OUTPUT, EMBED_CSV, KFOLD, THREADS = _get_args()
+    SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, PDIM, DISTANCE, METHOD, DIM, OUTPUT, EMBED_CSV, KFOLD, THREADS = _get_args()
     SEED = utils.check_gen_seed(SEED)
     np.random.seed(SEED)
     embed_method = utils.check_embed(METHOD)
     normalization = utils.check_norm(NORMALIZATION)
     sinks = utils.split_sinks(SINK)
     predictions = {}
+    distance_method = utils.check_distance(DISTANCE)
     unifrac_rank = "species"
     samp_pred = {}
     print("Step 1: Checking for unknown proportion")
@@ -145,8 +153,8 @@ if __name__ == "__main__":
     print("Step 2: Checking for source proportion")
     u = sourcemap(train=SOURCES, test=SINK, labels=LABELS,
                   norm_method=NORMALIZATION, threads=THREADS)
-    print(f"\tComputing weighted unifrac distance on {unifrac_rank} rank")
-    u.compute_distance(rank=unifrac_rank)
+    print(f"\tComputing {distance_method} distance on {unifrac_rank} rank")
+    u.compute_distance(distance_method=distance_method, rank=unifrac_rank)
     print(f"\t{embed_method} embedding")
     u.embed(n_comp=DIM, method=embed_method, seed=SEED, out_csv=EMBED_CSV)
     print("\tKNN machine learning")
@@ -158,3 +166,5 @@ if __name__ == "__main__":
         OUTPUT = f"{utils._get_basename(SINK)}.sourcepredict.csv"
     prediction.to_csv(OUTPUT)
     print(f"Sourcepredict result written to {OUTPUT}")
+    if EMBED_CSV:
+        print(f"Embedding coordinates written to {EMBED_CSV}")

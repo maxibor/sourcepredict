@@ -2,7 +2,7 @@
 
 <img src="img/sourcepredict_logo.png" width="300">
 
-Prediction/source tracking of sample source using a random forest approach
+Prediction/classification of the origin of a metagenomics sample.
 
 ## Installation
 
@@ -17,40 +17,56 @@ $ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/
 $ sourcepredict dog_test_sample.csv
 == Sample: ERR1915662 ==
 Step 1: Checking for unknown proportion
+  == Sample: ERR1915662 ==
 	Adding unknown
-	Normalizing
+	Normalizing (GMPR)
 	Feature engineering
 	Random forest machine learning
-	Performing 3 fold cross validation on 2 cores...
+	Performing 2 fold cross validation on 2 cores...
 	Training random forest classifier with best parameters on 2 cores...
 	-> Testing Accuracy: 1.0
 	----------------------
-	- Unknown: 0.0%
-Step 2: Checking for source proportion
-	Computing weighted unifrac distance on species rank
-	UMAP embedding
-	KNN machine learning
-	Performing 3 fold cross validation on 2 cores...
+	- Unknown: 0.85%
+  == Sample: ERR1915662_copy ==
+	Adding unknown
+	Normalizing (GMPR)
+	Feature engineering
+	Random forest machine learning
+	Performing 2 fold cross validation on 2 cores...
+	Training random forest classifier with best parameters on 2 cores...
 	-> Testing Accuracy: 1.0
 	----------------------
-	- Canis_familiaris:1.0
-	- Homo_sapiens:0.0
-	- Sus_scrofa:0.0
-============================
+	- Unknown: 0.85%
+Step 2: Checking for source proportion
+	Computing weighted_unifrac distance on species rank
+	TSNE embedding
+	KNN machine learning
+	Performing 2 fold cross validation on 2 cores...
+	-> Testing Accuracy: 1.0
+	----------------------
+	- Sample: ERR1915662
+		 Canis_familiaris:0.9565764720857306
+		 Homo_sapiens:0.030018612301057016
+		 Soil:0.013404915613212503
+	- Sample: ERR1915662_copy
+		 Canis_familiaris:0.9565764720857306
+		 Homo_sapiens:0.030018612301057016
+		 Soil:0.013404915613212503
+Sourcepredict result written to dog_test_sample.sourcepredict.csv
 ```
 
 ## Help
 
 ```
 $ sourcepredict -h
-usage: SourcePredict v0.21 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
-                           [-n NORMALIZATION] [-pd PCA_DIM] [-ud UMAP_DIM]
-                           [-o OUTPUT] [-u UMAP] [-se SEED] [-k KFOLD]
-                           [-t THREADS]
-                           otu_table
+usage: SourcePredict v0.3 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
+                          [-n NORMALIZATION] [-pd PCA_DIM] [-dt DISTANCE]
+                          [-me METHOD] [-e EMBED] [-di DIM] [-o OUTPUT]
+                          [-se SEED] [-k KFOLD] [-t THREADS]
+                          otu_table
 
 ==========================================================
-SourcePredict v0.21
+SourcePredict v0.3
 Coprolite source classification
 Author: Maxime Borry
 Contact: <borry[at]shh.mpg.de>
@@ -68,14 +84,16 @@ optional arguments:
                     data/modern_gut_microbiomes_sources.csv
   -l LABELS         Path to labels csv file. Default =
                     data/modern_gut_microbiomes_labels.csv
-  -n NORMALIZATION  Normalization method (RLE | CLR | Subsample). Default =
-                    RLE
+  -n NORMALIZATION  Normalization method (RLE | CLR | Subsample | GMPR).
+                    Default = GMPR
   -pd PCA_DIM       Number of PCA components to retain for dimension reduction
-  -ud UMAP_DIM      Number of UMAP dimensions to retain for dimension
-                    reduction
+  -dt DISTANCE      Distance method. (unweighted_unifrac | weighted_unifrac)
+                    Default = weighted_unifrac
+  -me METHOD        Embedding Method. TSNE or UMAP. Default = TSNE
+  -e EMBED          Output embedding csv file. Default = None
+  -di DIM           Number of dimensions to retain for dimension reduction
   -o OUTPUT         Output file basename. Default =
                     <sample_basename>.sourcepredict.csv
-  -u UMAP           Umap embedding csv file. Default = None
   -se SEED          Seed for random generator. Default = 42
   -k KFOLD          Number of fold for K-fold cross validation in feature
                     selection and parameter optimization. Default = 3
@@ -89,11 +107,11 @@ optional arguments:
 - The label file for this source file is here [data/modern_gut_microbiomes_sources.csv](data/modern_gut_microbiomes_labels.csv)
 
 
-### Current species included in the source file
+### Environments included in the default source file
 
-- *Sus scrofa*
-- *Homo sapiens*
-- *Canis familiaris*
+- *Homo sapiens* gut microbiome
+- *Canis familiaris* gut microbiom
+- Soil microbiome
 
 ### Updating the source file 
 

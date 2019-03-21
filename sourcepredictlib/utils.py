@@ -64,10 +64,20 @@ def check_norm(method):
 
 
 def check_embed(method):
-    methods = ['TSNE', 'UMAP']
+    methods = ['TSNE', 'UMAP', 'MDS']
     method = method.upper()
     if method not in methods:
         print(f"Please check the embedding method ({' or '.join(methods)})")
+        sys.exit(1)
+    else:
+        return(method)
+
+
+def check_distance(method):
+    methods = ['weighted_unifrac', 'unweighted_unifrac']
+    method = method.lower()
+    if method not in methods:
+        print(f"Please check the distance method ({' or '.join(methods)})")
         sys.exit(1)
     else:
         return(method)

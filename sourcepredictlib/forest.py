@@ -8,10 +8,12 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import RFECV
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn import metrics
 from skbio.diversity import beta_diversity
+from skbio.stats.ordination import pcoa as skbio_mds
 from skbio import TreeNode
 from ete3 import NCBITaxa
 from io import StringIO
@@ -114,6 +116,8 @@ class sourceforest():
     def rndForest(self, seed, threads, outfile, kfold):
         train_features, test_features, train_labels, test_labels = train_test_split(
             self.feat_unk.drop('label', axis=1), self.feat_unk.loc[:, 'label'], test_size=0.2, random_state=seed)
+        train_features, validation_features, train_labels, validation_labels = train_test_split(
+            self.feat_unk.drop('label', axis=1), self.feat_unk.loc[:, 'label'], test_size=0.2, random_state=seed)
 
         rfc = RandomForestClassifier(random_state=seed, n_jobs=threads)
 
@@ -144,7 +148,11 @@ class sourceforest():
         y_pred = rfc1.predict(test_features)
         print("\t-> Testing Accuracy:", round(metrics.accuracy_score(
             test_labels, y_pred), 2))
-        self.sink_pred_unk = rfc1.predict_proba(self.sink_unk)
+
+        cal_rf = CalibratedClassifierCV(rfc1, cv='prefit', method='sigmoid')
+        cal_rf.fit(validation_features, validation_labels)
+
+        self.sink_pred_unk = cal_rf.predict_proba(self.sink_unk)
         sample = [''.join(list(self.tmp_sink.columns))]
         predictions = utils.class2dict(
             samples=sample, classes=rfc1.classes_, pred=self.sink_pred_unk)
@@ -166,37 +174,37 @@ class sourcemap():
         combined = self.train.merge(
             self.test, how='outer', left_index=True, right_index=True).fillna(0)
         if norm_method == 'RLE':
-            self.combined = normalize.RLE_normalize(combined).T
+            self.normalized = normalize.RLE_normalize(combined).T
         elif norm_method == 'SUBSAMPLE':
-            self.combined = normalize.subsample_normalize_pd(combined).T
+            self.normalized = normalize.subsample_normalize_pd(combined).T
         elif norm_method == 'CLR':
-            self.combined = normalize.CLR_normalize(combined).T
+            self.normalized = normalize.CLR_normalize(combined).T
         elif norm_method == 'GMPR':
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", RuntimeWarning)
-                self.combined = normalize.GMPR_normalize(combined, threads).T
+                self.normalized = normalize.GMPR_normalize(combined, threads).T
         self.train_samples = list(self.train.columns)
         self.test_samples = list(self.test.columns)
         labels = pd.read_csv(labels, index_col=0)
         self.labels = labels.loc[self.train.columns, 'labels']
 
-    def compute_distance(self, rank='species'):
+    def compute_distance(self, distance_method, rank='species'):
         # Getting a single Taxonomic rank
         ncbi = NCBITaxa()
         only_rank = []
-        for i in list(self.combined.columns):
+        for i in list(self.normalized.columns):
             try:
                 if ncbi.get_rank([i])[i] == rank:
                     only_rank.append(i)
             except KeyError:
                 continue
-        self.normalized_rank = self.combined.loc[:, only_rank]
+        self.normalized_rank = self.normalized.loc[:, only_rank]
         tree = ncbi.get_topology(
             list(self.normalized_rank.columns), intermediate_nodes=False)
         newick = TreeNode.read(StringIO(tree.write()))
-        wu = beta_diversity("weighted_unifrac", self.normalized_rank.as_matrix().astype(int), ids=list(
+        self.skbio_wu = beta_diversity(distance_method, self.normalized_rank.as_matrix().astype(int), ids=list(
             self.normalized_rank.index), otu_ids=[str(i) for i in list(self.normalized_rank.columns)], tree=newick)
-        self.wu = wu.to_data_frame()
+        self.wu = self.skbio_wu.to_data_frame()
 
     def embed(self, method, out_csv, seed, n_comp=200):
 
@@ -206,19 +214,31 @@ class sourcemap():
             embed = umap.UMAP(metric='precomputed',
                               n_neighbors=30, min_dist=0.03, n_components=n_comp, random_state=seed, n_epochs=500)
             my_embed = embed.fit(self.wu)
-        else:
+        elif method == 'TSNE':
             embed = TSNE(metric='precomputed',
                          n_components=n_comp, random_state=seed)
             my_embed = embed.fit(np.matrix(self.wu))
+        elif method == 'MDS':
+            embed = skbio_mds(self.skbio_wu, number_of_dimensions=n_comp)
+            my_embed = pd.DataFrame()
+            for i in range(n_comp):
+                my_embed[f"PC{i+1}"] = list(embed.samples.loc[:, f"PC{i+1}"])
+        else:
+            print(f"Error, {method} embedding method not supported")
+            sys.exit(1)
 
-        self.my_embed = pd.DataFrame(
-            my_embed.embedding_, columns=cols, index=self.wu.index)
+        if method in (['TSNE', 'UMAP']):
+            self.my_embed = pd.DataFrame(
+                my_embed.embedding_, columns=cols, index=self.wu.index)
+        elif method == 'MDS':
+            self.my_embed = my_embed
+            self.my_embed.set_index(self.wu.index, inplace=True)
 
         if out_csv:
             to_write = self.my_embed.copy(deep=True)
             y = self.labels.copy(deep=True)
             y = y.append(
-                pd.Series(data=['sink']*len(list(self.test.index)), index=self.test.index))
+                pd.Series(data=['sink']*len(list(self.test.columns)), index=self.test.columns, name='labels'))
             to_write = to_write.merge(y, left_index=True, right_index=True)
             to_write['name'] = to_write.index
             to_write.to_csv(out_csv)
@@ -231,11 +251,13 @@ class sourcemap():
     def knn_classification(self, kfold, threads, seed):
         train_features, test_features, train_labels, test_labels = train_test_split(
             self.source.drop('labels', axis=1), self.source.loc[:, 'labels'], test_size=0.2, random_state=seed)
+        train_features, validation_features, train_labels, validation_labels = train_test_split(
+            self.source.drop('labels', axis=1), self.source.loc[:, 'labels'], test_size=0.2, random_state=seed)
+
         knn = KNeighborsClassifier(n_jobs=threads)
 
         param_knn_grid = {
-            'n_neighbors': [3, 5, 10, 15, 20, 30],
-            'weights': ['uniform', 'distance']
+            'n_neighbors': [3, 5, 10, 15, 20, 30]
         }
 
         CV_knn = GridSearchCV(
@@ -246,13 +268,17 @@ class sourcemap():
         CV_knn.fit(train_features, train_labels)
 
         knn1 = KNeighborsClassifier(
-            n_neighbors=CV_knn.best_params_['n_neighbors'], weights=CV_knn.best_params_['weights'], n_jobs=threads)
+            n_neighbors=CV_knn.best_params_['n_neighbors'], weights='distance', n_jobs=threads)
 
         knn1.fit(train_features, train_labels)
         y_pred = knn1.predict(test_features)
         print("\t-> Testing Accuracy:", round(metrics.accuracy_score(
             test_labels, y_pred), 2))
-        self.sink_pred = knn1.predict_proba(self.sink)
+
+        cal_knn = CalibratedClassifierCV(knn1, cv='prefit', method='sigmoid')
+        cal_knn.fit(validation_features, validation_labels)
+
+        self.sink_pred = cal_knn.predict_proba(self.sink)
         utils.print_class(samples=self.sink.index,
                           classes=knn1.classes_, pred=self.sink_pred)
         predictions = utils.class2dict(
