@@ -53,7 +53,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         '-pd',
         dest="pca_dim",
         default=20,
-        help="Number of PCA components to retain for dimension reduction"
+        help="Number of PCA components to retain for dimension reduction. Default = 20"
     )
     parser.add_argument(
         '-dt',
@@ -143,8 +143,11 @@ if __name__ == "__main__":
         print(f"\tNormalizing ({normalization})")
         a.normalize(method=normalization, threads=THREADS)
         print("\tFeature engineering")
-        a.dim_reduction(PDIM)
+        # a.dim_reduction(PDIM)
         # a.select_features(cv=KFOLD, quantile=0.20, threads=THREADS)
+        a.compute_distance(distance_method=distance_method, rank=unifrac_rank)
+        a.embed(n_comp=DIM, seed=SEED, out_csv=EMBED_CSV)
+
         print("\tRandom forest machine learning")
         pred = a.rndForest(seed=SEED, threads=THREADS,
                            outfile=OUTPUT, kfold=KFOLD)
