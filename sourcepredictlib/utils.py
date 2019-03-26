@@ -11,7 +11,7 @@ def print_class(samples, classes, pred):
     for i in range(0, len(samples)):
         sample = samples[i]
         print(f"\t- Sample: {sample}")
-        [print(f'\t\t {i}:{j}')
+        [print(f'\t\t {i}:{round(j*100,2)}%')
          for i, j in zip(list(classes), list(pred[i, :]))]
 
 
@@ -61,6 +61,13 @@ def check_norm(method):
         sys.exit(1)
     else:
         return(method)
+
+
+def plural(count):
+    if count == 1:
+        return('')
+    else:
+        return('s')
 
 
 def check_embed(method):

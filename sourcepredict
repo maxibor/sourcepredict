@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import argparse
-from sourcepredictlib.forest import sourceforest
-from sourcepredictlib.forest import sourcemap
+from sourcepredictlib.ml import sourceunknown
+from sourcepredictlib.ml import sourcemap
 from sourcepredictlib import utils
 import os
 import pandas as pd
@@ -50,12 +50,6 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         default='GMPR',
         help="Normalization method (RLE | CLR | Subsample | GMPR). Default = GMPR")
     parser.add_argument(
-        '-pd',
-        dest="pca_dim",
-        default=20,
-        help="Number of PCA components to retain for dimension reduction. Default = 20"
-    )
-    parser.add_argument(
         '-dt',
         dest="distance",
         default='weighted_unifrac',
@@ -76,7 +70,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         '-di',
         dest="dim",
         default=2,
-        help="Number of dimensions to retain for dimension reduction"
+        help="Number of dimensions to retain for dimension reduction. Default = 2"
     )
     parser.add_argument(
         '-o',
@@ -91,8 +85,8 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     parser.add_argument(
         '-k',
         dest="kfold",
-        default=2,
-        help="Number of fold for K-fold cross validation in feature selection and parameter optimization. Default = 2")
+        default=5,
+        help="Number of fold for K-fold cross validation in feature selection and parameter optimization. Default = 5")
     parser.add_argument(
         '-t',
         dest="threads",
@@ -108,7 +102,6 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     labels = args.labels
     seed = int(args.seed)
     distance = args.distance
-    pdim = int(args.pca_dim)
     method = args.method
     dim = int(args.dim)
     output = args.output
@@ -116,13 +109,13 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     kfold = int(args.kfold)
     threads = int(args.threads)
 
-    return(sink, alpha, normalization, sources, labels, seed, pdim, distance, method, dim, output, embed, kfold, threads)
+    return(sink, alpha, normalization, sources, labels, seed, distance, method, dim, output, embed, kfold, threads)
 
 
 if __name__ == "__main__":
     version = "0.3"
     warnings.filterwarnings("ignore")
-    SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, PDIM, DISTANCE, METHOD, DIM, OUTPUT, EMBED_CSV, KFOLD, THREADS = _get_args()
+    SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, DISTANCE, METHOD, DIM, OUTPUT, EMBED_CSV, KFOLD, THREADS = _get_args()
     SEED = utils.check_gen_seed(SEED)
     np.random.seed(SEED)
     embed_method = utils.check_embed(METHOD)
@@ -130,35 +123,34 @@ if __name__ == "__main__":
     sinks = utils.split_sinks(SINK)
     predictions = {}
     distance_method = utils.check_distance(DISTANCE)
-    unifrac_rank = "species"
+    tax_rank = "species"
     samp_pred = {}
     print("Step 1: Checking for unknown proportion")
     for s in sinks:
         sample = ''.join(list(s.columns))
         samp_pred[sample] = {}
         print(f"  == Sample: {sample} ==")
-        a = sourceforest(source=SOURCES, sink=s, labels=LABELS)
+        a = sourceunknown(source=SOURCES, sink=s, labels=LABELS)
         print("\tAdding unknown")
         a.add_unknown(alpha=ALPHA, seed=SEED)
         print(f"\tNormalizing ({normalization})")
         a.normalize(method=normalization, threads=THREADS)
-        print("\tFeature engineering")
-        # a.dim_reduction(PDIM)
-        # a.select_features(cv=KFOLD, quantile=0.20, threads=THREADS)
-        a.compute_distance(distance_method=distance_method, rank=unifrac_rank)
+        print("\tComputing Bray-Curtis distance")
+        a.compute_distance(rank=tax_rank)
+        print(
+            f"\tPerforming MDS embedding in {DIM} dimension{utils.plural(DIM)}")
         a.embed(n_comp=DIM, seed=SEED, out_csv=EMBED_CSV)
 
-        print("\tRandom forest machine learning")
-        pred = a.rndForest(seed=SEED, threads=THREADS,
-                           outfile=OUTPUT, kfold=KFOLD)
+        print("\tKNN machine learning")
+        pred = a.ml(seed=SEED, threads=THREADS)
         samp_pred[sample]['unknown'] = pred[sample]['unknown']
 
     print("Step 2: Checking for source proportion")
-    u = sourcemap(train=SOURCES, test=SINK, labels=LABELS,
+    u = sourcemap(source=SOURCES, sink=SINK, labels=LABELS,
                   norm_method=NORMALIZATION, threads=THREADS)
-    print(f"\tComputing {distance_method} distance on {unifrac_rank} rank")
-    u.compute_distance(distance_method=distance_method, rank=unifrac_rank)
-    print(f"\t{embed_method} embedding")
+    print(f"\tComputing {distance_method} distance on {tax_rank} rank")
+    u.compute_distance(distance_method=distance_method, rank=tax_rank)
+    print(f"\t{embed_method} embedding in {DIM} dimension{utils.plural(DIM)}")
     u.embed(n_comp=DIM, method=embed_method, seed=SEED, out_csv=EMBED_CSV)
     print("\tKNN machine learning")
     umap_pred = u.knn_classification(
