@@ -147,7 +147,8 @@ class sourceunknown():
         method = 'MDS'
         cols = [f"PC{i}" for i in range(1, n_comp+1)]
 
-        embed = skbio_mds(self.skbio_wu, number_of_dimensions=n_comp)
+        embed = skbio_mds(
+            self.skbio_wu, number_of_dimensions=n_comp, method='fsvd')
         my_embed = pd.DataFrame()
         for i in range(n_comp):
             my_embed[f"PC{i+1}"] = list(embed.samples.loc[:, f"PC{i+1}"])
@@ -280,7 +281,8 @@ class sourcemap():
                          n_components=n_comp, random_state=seed)
             my_embed = embed.fit(np.matrix(self.wu))
         elif method == 'MDS':
-            embed = skbio_mds(self.skbio_wu, number_of_dimensions=n_comp)
+            embed = skbio_mds(
+                self.skbio_wu, number_of_dimensions=n_comp, method='fsvd')
             my_embed = pd.DataFrame()
             for i in range(n_comp):
                 my_embed[f"PC{i+1}"] = list(embed.samples.loc[:, f"PC{i+1}"])
