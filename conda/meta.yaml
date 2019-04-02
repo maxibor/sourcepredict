@@ -1,6 +1,6 @@
 package:
   name: sourcepredict
-  version: "0.3"
+  version: "0.31"
 
 source:
   path: ../
@@ -25,3 +25,5 @@ about:
   home: https://github.com/maxibor/sourcepredict
   license: GPL-3.0
   summary: 'Prediction/source tracking of sample source using composite learning'
+
+# Build using: conda build -c etetoolkit -c bioconda -c maxibor .
