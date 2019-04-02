@@ -26,4 +26,4 @@ about:
   license: GPL-3.0
   summary: 'Prediction/source tracking of sample source using composite learning'
 
-# Build using: conda build -c etetoolkit -c bioconda -c maxibor .
+# Build using: conda build -c conda-forge -c etetoolkit -c bioconda .
