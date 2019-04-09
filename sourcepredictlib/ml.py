@@ -157,8 +157,9 @@ class sourceunknown():
         self.my_embed.set_index(self.wu.index, inplace=True)
 
         self.source = self.my_embed.drop(self.tmp_sink.columns, axis=0)
+        # self.source['labels'] =
         self.source = self.source.merge(
-            self.labels, left_index=True, right_index=True)
+            self.labels.to_frame(), left_index=True, right_index=True)
         self.sink = self.my_embed.loc[self.tmp_sink.columns, :]
 
         if out_csv:
@@ -308,7 +309,7 @@ class sourcemap():
 
         self.source = self.my_embed.drop(self.test_samples, axis=0)
         self.source = self.source.merge(
-            self.labels, left_index=True, right_index=True)
+            self.labels.to_frame(), left_index=True, right_index=True)
         self.sink = self.my_embed.drop(self.train_samples, axis=0)
 
     def knn_classification(self, kfold, threads, seed):
