@@ -332,7 +332,7 @@ class sourcemap():
         knn = KNeighborsClassifier(n_jobs=threads)
 
         param_knn_grid = {
-            'n_neighbors': [10, 20, 50, 100]
+            'n_neighbors': [10, 20, 50]
         }
 
         CV_knn = GridSearchCV(
