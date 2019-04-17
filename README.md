@@ -14,44 +14,48 @@ $ conda install -c etetoolkit -c bioconda -c maxibor sourcepredict
 
 ```bash
 $ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv?token=AIOyNX-Styi0FWlY-9ZILyGbh8EpEYmDks5cd_k4wA%3D%3D -O dog_test_sample.csv
-$ sourcepredict dog_test_sample.csv
-== Sample: ERR1915662 ==
+$ sourcepredict -t 6 dog_test_sample.csv
 Step 1: Checking for unknown proportion
   == Sample: ERR1915662 ==
 	Adding unknown
 	Normalizing (GMPR)
-	Feature engineering
-	Random forest machine learning
-	Performing 2 fold cross validation on 2 cores...
-	Training random forest classifier with best parameters on 2 cores...
-	-> Testing Accuracy: 1.0
-	----------------------
-	- Unknown: 0.85%
-  == Sample: ERR1915662_copy ==
-	Adding unknown
-	Normalizing (GMPR)
-	Feature engineering
-	Random forest machine learning
-	Performing 2 fold cross validation on 2 cores...
-	Training random forest classifier with best parameters on 2 cores...
-	-> Testing Accuracy: 1.0
-	----------------------
-	- Unknown: 0.85%
-Step 2: Checking for source proportion
-	Computing weighted_unifrac distance on species rank
-	TSNE embedding
+	Computing Bray-Curtis distance
+	Performing MDS embedding in 2 dimensions
 	KNN machine learning
-	Performing 2 fold cross validation on 2 cores...
+	Training KNN classifier on 6 cores...
 	-> Testing Accuracy: 1.0
 	----------------------
 	- Sample: ERR1915662
-		 Canis_familiaris:0.9565764720857306
-		 Homo_sapiens:0.030018612301057016
-		 Soil:0.013404915613212503
+		 known:98.61%
+		 unknown:1.39%
+  == Sample: ERR1915662_copy ==
+	Adding unknown
+	Normalizing (GMPR)
+	Computing Bray-Curtis distance
+	Performing MDS embedding in 2 dimensions
+	KNN machine learning
+	Training KNN classifier on 6 cores...
+	-> Testing Accuracy: 1.0
+	----------------------
 	- Sample: ERR1915662_copy
-		 Canis_familiaris:0.9565764720857306
-		 Homo_sapiens:0.030018612301057016
-		 Soil:0.013404915613212503
+		 known:98.61%
+		 unknown:1.39%
+Step 2: Checking for source proportion
+	Computing weighted_unifrac distance on species rank
+	TSNE embedding in 2 dimensions
+	KNN machine learning
+	Performing 5 fold cross validation on 6 cores...
+	Trained KNN classifier with 10 neighbors
+	-> Testing Accuracy: 0.99
+	----------------------
+	- Sample: ERR1915662
+		 Canis_familiaris:96.14%
+		 Homo_sapiens:2.44%
+		 Soil:1.42%
+	- Sample: ERR1915662_copy
+		 Canis_familiaris:96.14%
+		 Homo_sapiens:2.44%
+		 Soil:1.42%
 Sourcepredict result written to dog_test_sample.sourcepredict.csv
 ```
 
@@ -59,14 +63,14 @@ Sourcepredict result written to dog_test_sample.sourcepredict.csv
 
 ```
 $ sourcepredict -h
-usage: SourcePredict v0.3 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
-                          [-n NORMALIZATION] [-pd PCA_DIM] [-dt DISTANCE]
-                          [-me METHOD] [-e EMBED] [-di DIM] [-o OUTPUT]
-                          [-se SEED] [-k KFOLD] [-t THREADS]
-                          otu_table
+usage: SourcePredict v0.3.1 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
+                            [-n NORMALIZATION] [-dt DISTANCE] [-me METHOD]
+                            [-e EMBED] [-di DIM] [-o OUTPUT] [-se SEED]
+                            [-k KFOLD] [-t THREADS]
+                            otu_table
 
 ==========================================================
-SourcePredict v0.3
+SourcePredict v0.3.1
 Coprolite source classification
 Author: Maxime Borry
 Contact: <borry[at]shh.mpg.de>
@@ -86,17 +90,17 @@ optional arguments:
                     data/modern_gut_microbiomes_labels.csv
   -n NORMALIZATION  Normalization method (RLE | CLR | Subsample | GMPR).
                     Default = GMPR
-  -pd PCA_DIM       Number of PCA components to retain for dimension reduction
   -dt DISTANCE      Distance method. (unweighted_unifrac | weighted_unifrac)
                     Default = weighted_unifrac
   -me METHOD        Embedding Method. TSNE or UMAP. Default = TSNE
   -e EMBED          Output embedding csv file. Default = None
-  -di DIM           Number of dimensions to retain for dimension reduction
+  -di DIM           Number of dimensions to retain for dimension reduction.
+                    Default = 2
   -o OUTPUT         Output file basename. Default =
                     <sample_basename>.sourcepredict.csv
   -se SEED          Seed for random generator. Default = 42
   -k KFOLD          Number of fold for K-fold cross validation in feature
-                    selection and parameter optimization. Default = 3
+                    selection and parameter optimization. Default = 5
   -t THREADS        Number of threads for parallel processing. Default = 2
 ```
 
