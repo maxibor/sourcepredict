@@ -6,6 +6,11 @@
 Welcome to sourcepredict's documentation!
 =========================================
 
+Homepage: `github.com/maxibor/sourcepredict`__
+
+.. _homepage: https://github.com/maxibor/sourcepredict
+__ homepage_ 
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
