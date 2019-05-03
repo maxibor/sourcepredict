@@ -9,7 +9,6 @@ import pandas as pd
 import numpy as np
 import warnings
 import sys
-from . import utils
 
 
 def _get_args():
@@ -86,7 +85,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         '-k',
         dest="kfold",
         default=5,
-        help="Number of fold for K-fold cross validation in feature selection and parameter optimization. Default = 5")
+        help="Number of fold for K-fold cross validation in parameter optimization. Default = 5")
     parser.add_argument(
         '-t',
         dest="threads",
