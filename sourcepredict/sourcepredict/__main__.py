@@ -1,25 +1,26 @@
 #!/usr/bin/env python3
 
 import argparse
-from sourcepredictlib.ml import sourceunknown
-from sourcepredictlib.ml import sourcemap
-from sourcepredictlib import utils
+from sourcepredict.lib.ml import sourceunknown
+from sourcepredict.lib.ml import sourcemap
+from sourcepredict.lib import utils
 import os
 import pandas as pd
 import numpy as np
 import warnings
 import sys
-from . import utils
+
+__version__ = '0.3.3'
 
 
 def _get_args():
     '''This function parses and return arguments passed in'''
     parser = argparse.ArgumentParser(
-        prog='SourcePredict v' + str(version),
+        prog='SourcePredict v' + str(__version__),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=f'''
 ==========================================================
-SourcePredict v{version}
+SourcePredict v{__version__}
 Coprolite source classification
 Author: Maxime Borry
 Contact: <borry[at]shh.mpg.de>
@@ -112,9 +113,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     return(sink, alpha, normalization, sources, labels, seed, distance, method, dim, output, embed, kfold, threads)
 
 
-if __name__ == "__main__":
-    version = "0.32"
-    warnings.filterwarnings("ignore")
+def main():
     SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, DISTANCE, METHOD, DIM, OUTPUT, EMBED_CSV, KFOLD, THREADS = _get_args()
     SEED = utils.check_gen_seed(SEED)
     np.random.seed(SEED)
@@ -163,3 +162,8 @@ if __name__ == "__main__":
     print(f"Sourcepredict result written to {OUTPUT}")
     if EMBED_CSV:
         print(f"Embedding coordinates written to {EMBED_CSV}")
+
+
+if __name__ == "__main__":
+    warnings.filterwarnings("ignore")
+    main()

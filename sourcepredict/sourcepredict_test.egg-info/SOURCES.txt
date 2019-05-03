@@ -1,0 +1,17 @@
+MANIFEST.in
+README.md
+requirements.txt
+setup.cfg
+setup.py
+sourcepredict/__init__.py
+sourcepredict/__main__.py
+sourcepredict/lib/__init__.py
+sourcepredict/lib/ml.py
+sourcepredict/lib/normalize.py
+sourcepredict/lib/utils.py
+sourcepredict_test.egg-info/PKG-INFO
+sourcepredict_test.egg-info/SOURCES.txt
+sourcepredict_test.egg-info/dependency_links.txt
+sourcepredict_test.egg-info/entry_points.txt
+sourcepredict_test.egg-info/requires.txt
+sourcepredict_test.egg-info/top_level.txt

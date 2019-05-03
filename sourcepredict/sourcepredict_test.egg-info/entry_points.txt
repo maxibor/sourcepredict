@@ -1,0 +1,3 @@
+[console_scripts]
+sourcepredict = sourcepredict.__main__:main
+
