@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.com/maxibor/sourcepredict.svg?token=pwT9AgYi4qJY4LTp9WUy&branch=master)](https://travis-ci.com/maxibor/sourcepredict) [![Anaconda-Server Badge](https://anaconda.org/maxibor/sourcepredict/badges/installer/conda.svg)](https://conda.anaconda.org/maxibor)
+[![Build Status](https://travis-ci.com/maxibor/sourcepredict.svg?token=pwT9AgYi4qJY4LTp9WUy&branch=master)](https://travis-ci.com/maxibor/sourcepredict) [![Anaconda-Server Badge](https://anaconda.org/maxibor/sourcepredict/badges/installer/conda.svg)](https://conda.anaconda.org/maxibor) [![Documentation Status](https://readthedocs.org/projects/sourcepredict/badge/?version=latest)](https://sourcepredict.readthedocs.io/en/latest/?badge=latest)
+
 
 <img src="img/sourcepredict_logo.png" width="300">
 
@@ -59,50 +60,9 @@ Step 2: Checking for source proportion
 Sourcepredict result written to dog_test_sample.sourcepredict.csv
 ```
 
-## Help
+## Documentation
 
-```
-$ sourcepredict -h
-usage: SourcePredict v0.3.1 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
-                            [-n NORMALIZATION] [-dt DISTANCE] [-me METHOD]
-                            [-e EMBED] [-di DIM] [-o OUTPUT] [-se SEED]
-                            [-k KFOLD] [-t THREADS]
-                            otu_table
-
-==========================================================
-SourcePredict v0.3.1
-Coprolite source classification
-Author: Maxime Borry
-Contact: <borry[at]shh.mpg.de>
-Homepage & Documentation: github.com/maxibor/sourcepredict
-==========================================================
-
-
-positional arguments:
-  otu_table         path to otu table in csv format
-
-optional arguments:
-  -h, --help        show this help message and exit
-  -a ALPHA          Proportion of sink sample in unknown. Default = 0.1
-  -s SOURCES        Path to source csv file. Default =
-                    data/modern_gut_microbiomes_sources.csv
-  -l LABELS         Path to labels csv file. Default =
-                    data/modern_gut_microbiomes_labels.csv
-  -n NORMALIZATION  Normalization method (RLE | CLR | Subsample | GMPR).
-                    Default = GMPR
-  -dt DISTANCE      Distance method. (unweighted_unifrac | weighted_unifrac)
-                    Default = weighted_unifrac
-  -me METHOD        Embedding Method. TSNE or UMAP. Default = TSNE
-  -e EMBED          Output embedding csv file. Default = None
-  -di DIM           Number of dimensions to retain for dimension reduction.
-                    Default = 2
-  -o OUTPUT         Output file basename. Default =
-                    <sample_basename>.sourcepredict.csv
-  -se SEED          Seed for random generator. Default = 42
-  -k KFOLD          Number of fold for K-fold cross validation in feature
-                    selection and parameter optimization. Default = 5
-  -t THREADS        Number of threads for parallel processing. Default = 2
-```
+The documentation of SourcePredict is available here: [sourcepredict.readthedocs.io](https://sourcepredict.readthedocs.io/en/latest/)
 
 ## Sourcepredict source file
 
