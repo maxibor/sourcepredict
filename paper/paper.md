@@ -17,7 +17,7 @@ bibliography: paper.bib
 
 # Summary
 
-SourcePredict is a Python package to classify and predict the source of metagenomics sample given a training set.  
+SourcePredict [(github.com/maxibor/sourcepredict)](https://github.com/maxibor/sourcepredict) is a Python package to classify and predict the source of metagenomics sample given a training set.  
 
 The DNA shotgun sequencing of human, animal, and environmental samples opened up new doors to explore the diversity of life in these different environments, a field known as metagenomics [@metagenomics].  
 One of the goals of metagenomics is to look at the composition of a sequencing sample with tools known as taxonomic classifiers.
@@ -74,5 +74,13 @@ $$\sum_{c=1}^{C} s_c + p_{unknown} = 1$$
 with  
 
 $$s_c = s_{c\ predicted}\times p_{unknown}$$
+
+## CLI
+
+The SourcePredict CLI is handled with ArgParse. A typical command to use SourcePredict is as simple as:  
+
+`sourcepredict path/to/test_otu_table.csv`
+
+The documentation of CLI is available at [sourcepredict.readthedocs.io](https://sourcepredict.readthedocs.io)
 
 # References
