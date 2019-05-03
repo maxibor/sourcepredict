@@ -13,7 +13,7 @@ $ conda install -c etetoolkit -c bioconda -c maxibor sourcepredict
 ## Example
 
 ```bash
-$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv?token=AIOyNX-Styi0FWlY-9ZILyGbh8EpEYmDks5cd_k4wA%3D%3D -O dog_test_sample.csv
+$ wget wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv -O dog_test_sample.csv
 $ sourcepredict -t 6 dog_test_sample.csv
 Step 1: Checking for unknown proportion
   == Sample: ERR1915662 ==
