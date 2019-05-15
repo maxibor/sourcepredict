@@ -1,5 +1,5 @@
 ---
-title: 'Sourcepredict: Prediction/source tracking of metagenomic samples source using machine learning'
+title: 'Sourcepredict: Prediction/source tracking of metagenomic sample sources using machine learning'
 tags:
   - microbiome
   - sourcetracking
@@ -11,7 +11,7 @@ authors:
 affiliations:
  - name: Department of Archaeogenetics, Max Planck Institute for the Science of Human History, Jena, 07745, Germany
    index: 1
-date: 3rd May 2019
+date: 15th May 2019
 bibliography: paper.bib
 ---
 
@@ -25,9 +25,10 @@ These taxonomic classifiers, such as Kraken [@kraken] for example, will compute 
 
 When in most cases the origin (source) of a metagenomic sample is known, it is sometimes part of the research question to infer and/or confirm its source.
 Using samples of known sources, a reference dataset can be established with the samples organism taxonomic composition as features, and the source of the sample as class labels.
-With this reference dataset, a machine learning algorithm can be trained to predict the source of unlabeled samples from their organism taxonomic composition.
+With this reference dataset, a machine learning algorithm can be trained to predict the source of unlabeled samples from their organism taxonomic composition.  
+Compared to SourceTracker [@sourcetracker], which uses gibbs sampling, Sourcepredict uses dimension reduction algorithms, followed by K-Nearest-Neighbors (KNN) classification.
 
-Here, I developed SourcePredict to perform the classification/prediction of unlabeled samples sources from their organism taxonomic compositions.
+Here, I present SourcePredict for the classification/prediction of unlabeled sample sources from their taxonomic compositions.
 
 ## Method
 
@@ -49,7 +50,7 @@ The $U_n$ samples are then merged as columns to the reference dataset ($D_{ref}$
 To predict this unknown proportion, the dimension of the reference dataset $D_{ref\ unknown}$ (samples in columns, organisms as rows) is first reduced to 20 with the scikit-learn [@scikit-learn] implementation of  PCA.  
 This reference dataset is then divided into three subsets: $D_{train\ unknown}$ (64%), $D_{test\ unknown}$ (20%), and $D_{validation unknown}$(16%). 
  
-The scikit-learn implementation of K-Nearest-Neighbors (KNN) algorithm is then trained on $D_{train\ unknown}$, and the test accuracy is computed with $D_{test\ unknown}$ .  
+The scikit-learn implementation of KNN algorithm is then trained on $D_{train\ unknown}$, and the test accuracy is computed with $D_{test\ unknown}$ .  
 The trained KNN model is then corrected for probability estimation of unknown proportion using the scikit-learn implementation of the Platt's scaling method [@platt] with $D_{validation\ unknown}$.
 This procedure is repeated for each sample of the test dataset.
 
@@ -80,12 +81,16 @@ with
 
 $$s_c = p_{c}\times p_{unknown}$$
 
-## CLI
+## Command Line Interface
 
 The SourcePredict CLI is handled with argparse. A typical command to use SourcePredict is as simple as:  
 
 `sourcepredict path/to/test_otu_table.csv`
 
 The documentation of CLI is available at [sourcepredict.readthedocs.io](https://sourcepredict.readthedocs.io)
+
+## Acknowledgements
+
+Thanks to Dr. Alexander Herbig for proofreading this manuscript.
 
 # References
