@@ -7,7 +7,7 @@
   "datePublished": "2019-05-02",
   "dateModified": "2019-05-02",
   "dateCreated": "2019-05-02",
-  "description": "Prediction/source tracking of metagenomic samples source using machine learning",
+  "description": "Sourcepredict: Prediction/source tracking of metagenomic sample sources using machine learning",
   "keywords": "microbiome, sourcetracking, machine learning",
   "license": "GPL v3.0",
   "title": "sourcepredict",

@@ -17,15 +17,15 @@ bibliography: paper.bib
 
 # Summary
 
-SourcePredict [(github.com/maxibor/sourcepredict)](https://github.com/maxibor/sourcepredict) is a Python package to classify and predict the source of metagenomics sample given a training set.  
+SourcePredict [(github.com/maxibor/sourcepredict)](https://github.com/maxibor/sourcepredict) is a Python Conda package to classify and predict the source of metagenomics sample given a reference dataset of known sources.  
 
 DNA shotgun sequencing of human, animal, and environmental samples opened up new doors to explore the diversity of life in these different environments, a field known as metagenomics [@metagenomics].  
 One of the aspect of metagenomics is to look at the organism composition in a sequencing sample, with tools known as taxonomic classifiers.
 These taxonomic classifiers, such as Kraken [@kraken] for example, will compute the organism taxonomic composition, from the DNA sequencing data.
 
 When in most cases the origin (source) of a metagenomic sample is known, it is sometimes part of the research question to infer and/or confirm its source.
-Using samples of known sources, a reference dataset can be established with the samples organism taxonomic composition as features, and the source of the sample as class labels.
-With this reference dataset, a machine learning algorithm can be trained to predict the source of unlabeled samples from their organism taxonomic composition.  
+Using samples of known sources, a reference dataset can be established with the samples taxonomic composition (the organisms identified in the sample) as features, and the source of the sample as class labels.
+With this reference dataset, a machine learning algorithm can be trained to predict the source of unlabeled samples from their taxonomic composition.  
 Compared to SourceTracker [@sourcetracker], which uses gibbs sampling, Sourcepredict uses dimension reduction algorithms, followed by K-Nearest-Neighbors (KNN) classification.
 
 Here, I present SourcePredict for the classification/prediction of unlabeled sample sources from their taxonomic compositions.
@@ -43,12 +43,12 @@ Let $S$ be a sample of size $O$ organims from the test dataset $D_{sink}$
 Let $n$ be the average number of samples per class in the reference dataset.  
 I define $U_n$ samples to add to the training dataset to account for the unknown source proportion in a test sample.  
 
-To compute $U_n$, a $\alpha$ proportion (default = $0.1$) of each $o_i$ organism (with $i\in[1,O]$) is added to the training dataset for each $U_j$ samples (with $j\in[1,n]$), such as $U_j(o_i) = \alpha\times S_(o_i)$  
+To compute $U_n$, a $\alpha$ proportion (default = $0.1$) of each $o_i$ organism (with $i\in[1,O]$) is added to the training dataset for each $U_j$ samples (with $j\in[1,n]$), such as $U_j(o_i) = \alpha\times S(o_i)$  
 
 The $U_n$ samples are then merged as columns to the reference dataset ($D_{ref}$) to create a new reference dataset denoted $D_{ref\ unknown}$
 
 To predict this unknown proportion, the dimension of the reference dataset $D_{ref\ unknown}$ (samples in columns, organisms as rows) is first reduced to 20 with the scikit-learn [@scikit-learn] implementation of  PCA.  
-This reference dataset is then divided into three subsets: $D_{train\ unknown}$ (64%), $D_{test\ unknown}$ (20%), and $D_{validation unknown}$(16%). 
+This reference dataset is then divided into three subsets: $D_{train\ unknown}$ (64%), $D_{test\ unknown}$ (20%), and $D_{validation\ unknown}$(16%). 
  
 The scikit-learn implementation of KNN algorithm is then trained on $D_{train\ unknown}$, and the test accuracy is computed with $D_{test\ unknown}$ .  
 The trained KNN model is then corrected for probability estimation of unknown proportion using the scikit-learn implementation of the Platt's scaling method [@platt] with $D_{validation\ unknown}$.
@@ -81,13 +81,7 @@ with
 
 $$s_c = p_{c}\times p_{unknown}$$
 
-## Command Line Interface
-
-The SourcePredict CLI is handled with argparse. A typical command to use SourcePredict is as simple as:  
-
-`sourcepredict path/to/test_otu_table.csv`
-
-The documentation of CLI is available at [sourcepredict.readthedocs.io](https://sourcepredict.readthedocs.io)
+Finally, a summary table is created to gather the estimated sources proportions.
 
 ## Acknowledgements
 
