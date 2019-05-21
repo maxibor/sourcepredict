@@ -1,1 +1,0 @@
-pandoc paper.md --bibliography=paper.bib -s -o paper.pdf

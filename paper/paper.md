@@ -39,52 +39,47 @@ Organism are represented by their taxonomic identifiers (TAXID).
 
 ### Prediction of unknown sources proportion
 
-Let $S$ be a sample of size $O$ organims from the test dataset $D_{sink}$  
-Let $n$ be the average number of samples per class in the reference dataset.  
-I define $U_n$ samples to add to the training dataset to account for the unknown source proportion in a test sample.  
 
-To compute $U_n$, a $\alpha$ proportion (default = $0.1$) of each $o_i$ organism (with $i\in[1,O]$) is added to the training dataset for each $U_j$ samples (with $j\in[1,n]$), such as $U_j(o_i) = \alpha\times S(o_i)$  
+Let $S_i \in \{S_1, .., S_n\}$ be a sample of size $O$ organisms $o_j$ from the test dataset $D_{sink}$, with $o_j \in \mathbb{Z}+$, and $j\in[1,O]$.  
+Let $m$ be the mean number of samples per class in the reference dataset, such as $m = \frac{1}{O}\sum_{i=1}^{O}S_i$.  
+I define $|m|$ estimated samples $U_k$ to add to the training dataset to account for the unknown source proportion in a test sample, with $k \in \{1,..,|m|\}$.  
 
-The $U_n$ samples are then merged as columns to the reference dataset ($D_{ref}$) to create a new reference dataset denoted $D_{ref\ unknown}$
+To compute each $U_k$, a $\alpha$ proportion ($\alpha \in [0,1]$, default = $0.1$) of each $o_j$ organism is added to the training dataset for each $U_k$ samples, such that $U_k(o_j) = \alpha \cdot x_{i \ j}$ , where $x_{i \ j}$ is sampled from the Gaussian distribution $\mathcal{N}\big(\mu=S_i(o_j), \sigma=0.1\big)$.  
 
-To predict this unknown proportion, the dimension of the reference dataset $D_{ref\ unknown}$ (samples in columns, organisms as rows) is first reduced to 20 with the scikit-learn [@scikit-learn] implementation of  PCA.  
-This reference dataset is then divided into three subsets: $D_{train\ unknown}$ (64%), $D_{test\ unknown}$ (20%), and $D_{validation\ unknown}$(16%). 
+The $|m|$ $U_k$ samples are then merged as columns to the reference dataset $D_{ref}$ (samples in columns, organisms as rows) to create a new reference dataset denoted $D_{ref\ u}$
+
+To predict this unknown proportion, the dimension of the reference dataset $D_{ref\ u}$ is reduced to the first 20 principal components with the scikit-learn [@scikit-learn] implementation of  PCA.  
+This dimensionally reduced reference dataset is further divided into three subsets: $D_{train\ u}$ ($64\%$), $D_{test\ u}$ ($20\%$), and $D_{validation\ u}$($16\%$). 
  
-The scikit-learn implementation of KNN algorithm is then trained on $D_{train\ unknown}$, and the test accuracy is computed with $D_{test\ unknown}$ .  
-The trained KNN model is then corrected for probability estimation of unknown proportion using the scikit-learn implementation of the Platt's scaling method [@platt] with $D_{validation\ unknown}$.
-This procedure is repeated for each sample of the test dataset.
+The scikit-learn implementation of K-Nearest-Neighbors (KNN) algorithm is then trained on $D_{train\ u}$, and the test accuracy is computed with $D_{test\ u}$ .  
+This trained KNN model is then corrected for probability estimation of unknown proportion using the scikit-learn implementation of the Platt's scaling method [@platt] with $D_{validation\ u}$.
+This procedure is repeated for each $S_i$ sample of the test dataset  $D_{sink}$.
 
-The proportion of unknown $p_{unknown}$ sources in each sample is then computed using the trained and corrected KNN model.
+$p_u$ is then estimated using this trained and corrected KNN mode, where $p_u$ is the proportion of unknown sources in each $S_i$ sample. 
 
 ### Prediction of known source proportion
 
 First, only organism TAXID corresponding to the *species* taxonomic level are kept using ETE toolkit [@ete3].
 A distance matrix is then computed on the merged training dataset $D_{ref}$ and test dataset $D_{sink}$ using the scikit-bio implementation of weighted Unifrac distance (default) [@wu].
 
-The distance matrix is then embedded in two dimensions using the scikit-learn implementation of t-SNE [@tsne].
+The distance matrix is embedded in two dimensions using the scikit-learn implementation of t-SNE [@tsne].
 
-The 2-dimensional embedding is then split back to training $D_{ref\ tsne}$ and testing dataset $D_{sink\ tsne}$.
+The 2-dimensional embedding is then split back to training $D_{ref\ t}$ and testing dataset $D_{sink\ t}$.
 
-The training dataset $D_{ref\ tsne}$ is further divided into three subsets: $D_{train\ tsne}$ (64%), $D_{test\ tsne}$ (20%), and $D_{validation\ tsne}$ (16%).  
-The scikit-learn implementation of K-Nearest-Neighbors (KNN) algorithm is then trained on the train subset, and the test accuracy is computed with $D_{test\ tsne}$.  
-The trained KNN model is then corrected for source proportion estimation using the scikit-learn implementation of the Platt's method with $D_{validation\ tsne}$.
+The training dataset $D_{ref\ tsne}$ is further divided into three subsets: $D_{train\ t}$ ($64\%$), $D_{test\ t}$ ($20\%$), and $D_{validation\ t}$ ($16\%$).  
+The KNN algorithm is then trained on the train subset, and the test accuracy is computed with $D_{test\ t}$.  
+This trained KNN model is then corrected for source proportion estimation using the scikit-learn implementation of the Platt's method with $D_{validation\ t}$.
 
-The proportion of each source $p_{c}$ sources in each sample is then computed using the trained and corrected KNN model.
+$p_{c}$ is then estimated using this trained and corrected KNN model, where $p_{c}$ is the proportion of each of source $c$ in each sample $S_i$.
 
 ### Combining unknown and source proportion
 
-Finally, for each sample, the predicted unknown proportion $p_{unknown}$ is then combined with the predicted proportion $p_{c}$ of each of the $C$ source class $c$ of the training dataset such as:
-
-$$\sum_{c=1}^{C} s_c + p_{unknown} = 1$$
-
-with  
-
-$$s_c = p_{c}\times p_{unknown}$$
+Finally, for each sample $S_i$ of the test dataset $D_{sink}$, the predicted unknown proportion $p_{u}$ is then combined with the predicted proportion $p_{c}$ for each of the $C$ sources $c$ of the training dataset such that $\sum_{c=1}^{C} s_c + p_u = 1$ where $s_c = p_c \cdot p_u$.
 
 Finally, a summary table is created to gather the estimated sources proportions.
 
 ## Acknowledgements
 
-Thanks to Dr. Alexander Herbig for proofreading this manuscript.
+Thanks to Dr. Alexander Herbig and Dr. Adam Ben Rohrlach for their valuable comments and for proofreading this manuscript.
 
 # References
