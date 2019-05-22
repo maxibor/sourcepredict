@@ -132,9 +132,9 @@ class sourceunknown():
             except KeyError:
                 continue
         self.normalized_rank = self.normalized_unk.loc[only_rank, :].T
-        self.skbio_wu = beta_diversity("braycurtis", counts=self.normalized_rank.as_matrix().astype(int), ids=list(
+        self.skbio_bc = beta_diversity("braycurtis", counts=self.normalized_rank.as_matrix().astype(int), ids=list(
             self.normalized_rank.index))
-        self.wu = self.skbio_wu.to_data_frame()
+        self.wu = self.skbio_bc.to_data_frame()
 
     def embed(self, out_csv, seed, n_comp=200):
         """
@@ -144,11 +144,9 @@ class sourceunknown():
             - seed(int): seed for random number generator
             - n_comp(int): dimension of embedding
         """
-        method = 'MDS'
-        cols = [f"PC{i}" for i in range(1, n_comp+1)]
 
         embed = skbio_mds(
-            self.skbio_wu, number_of_dimensions=n_comp, method='fsvd')
+            self.skbio_bc, number_of_dimensions=n_comp, method='fsvd')
         my_embed = pd.DataFrame()
         for i in range(n_comp):
             my_embed[f"PC{i+1}"] = list(embed.samples.loc[:, f"PC{i+1}"])
