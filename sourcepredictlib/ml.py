@@ -27,15 +27,17 @@ from . import utils
 class sourceunknown():
 
     def __init__(self, source, sink, labels):
-        """
+        """Init of sourceunknown object
+
         Init of sourceunknown object
         Combines sink and source in one pd Dataframe
+
         Args:
-            - source(str): training data csv file with OTUs at index, 
+            source(str): training data csv file with OTUs at index, 
                 Samples as columns
-            - sink(str): test data csv file with OTUs at index, 
+            sink(str): test data csv file with OTUs at index, 
                 Samples as columns
-            - labels(str): labels csv file with Samples in first column, 
+            labels(str): labels csv file with Samples in first column, 
                 class in 2nd column
 
         """
@@ -52,15 +54,17 @@ class sourceunknown():
         return(f'A sourceforest object of source {self.source} and sink {self.tmp_sink}')
 
     def add_unknown(self, alpha, seed):
-        """
+        """Add unkown
+
         Create unknown Samples from test sample
         N Random samples are created with N being average of class counts
         For each random samples OTU, count is taken from nornal distrib with a 
         mean of test OTU count.
+
         Args:
-            - alpha(float): proportion of each OTU count from test samples 
+            alpha(float): proportion of each OTU count from test samples 
                 to include in unknown sample
-            - seed(int): seed for random number generator
+            seed(int): seed for random number generator
         """
 
         np.random.seed = seed
@@ -85,12 +89,14 @@ class sourceunknown():
             data=['unknown']*len(unk_labs), index=unk_labs)
 
     def normalize(self, method, threads):
-        """
+        """Sample count normalization
+
         Performs normalization of the count data to balance coverage differences
         and missing OTUs
+
         Args:
-            - method(str): normalization method
-            - threads(int): number of threads for parallelization
+            method(str): normalization method
+            threads(int): number of threads for parallelization
         """
         if method == 'RLE':
             self.normalized = normalize.RLE_normalize(self.combined)
@@ -116,10 +122,10 @@ class sourceunknown():
         self.y_unk = self.y_unk.append(self.unk_labs)
 
     def compute_distance(self, rank='species'):
-        """
-        Sample pairwise distance computation
+        """Sample pairwise distance computation
+
         Args:
-            - rank(str): Taxonomics rank to keep for filtering OTUs
+            rank(str): Taxonomics rank to keep for filtering OTUs
         """
 
         # Getting a single Taxonomic rank
@@ -138,11 +144,13 @@ class sourceunknown():
 
     def embed(self, out_csv, seed, n_comp=200):
         """
+
         Embedding of a distance matrix in lower dimensions
+
         Args:
-            - out_csv(str): Path to file for writing out embedding coordinates
-            - seed(int): seed for random number generator
-            - n_comp(int): dimension of embedding
+            out_csv(str): Path to file for writing out embedding coordinates
+            seed(int): seed for random number generator
+            n_comp(int): dimension of embedding
         """
 
         embed = skbio_mds(
@@ -167,15 +175,17 @@ class sourceunknown():
             to_write.to_csv(out_csv)
 
     def ml(self, seed, threads):
-        """
+        """KNN machine learning
+
         KNN machine learning to predict unknown proportion
         Correction of predicted probabilies with Platt scaling from sklearn
         Training on 64% of data, validation on 16%, test on 20%
+
         Args:
-            - seed(int) seed for random number generator
-            - threads(int) number of threads for parallelization
+            seed(int): seed for random number generator
+            threads(int): number of threads for parallelization
         Returns:
-            - predictions(dict): Probability/proportion of each class
+            predictions(dict): Probability/proportion of each class
         """
         train_features, test_features, train_labels, test_labels = train_test_split(
             self.source.drop('labels', axis=1), self.source.loc[:, 'labels'], test_size=0.2, random_state=seed)
@@ -205,18 +215,22 @@ class sourceunknown():
 
 class sourcemap():
     def __init__(self, source, sink, labels, norm_method, threads=4):
-        '''
-        Init of sourceumap object
+        """Init of sourcemap object
+
+        Init of sourcemap object
         Combines sink and source in one pd Dataframe
+
         Args:
-            - source(str): training data csv file with OTUs at index, 
+            source (str): training data csv file with OTUs at index, 
                 Samples as columns
-            - sink(str): test data csv file with OTUs at index, 
+            sink (str): test data csv file with OTUs at index, 
                 Samples as columns
-            - labels(str): labels csv file with Samples in first column, 
+            labels (str): labels csv file with Samples in first column, 
                 class in 2nd column
-            - norm_method(str): normalization method
-        '''
+            norm_method (str): normalization method
+            threads (int, optional): number of processes for parallelization. Defaults to 4.
+        """
+
         self.train = pd.read_csv(source, index_col=0)
         self.test = pd.read_csv(sink, index_col=0)
         combined = self.train.merge(
@@ -237,12 +251,13 @@ class sourcemap():
         self.labels = labels.loc[self.train.columns, 'labels']
 
     def compute_distance(self, distance_method, rank='species'):
-        """
-        Sample pairwise distance computation
+        """Sample pairwise distance computation
+
         Args:
-            - distance_method(str): distance method used
-            - rank(str): Taxonomics rank to keep for filtering OTUs
+            distance_method (str): distance method
+            rank (str, optional): Taxonomics rank to keep for filtering OTUs. Defaults to 'species'.
         """
+
         # Getting a single Taxonomic rank
         ncbi = NCBITaxa()
         only_rank = []
@@ -261,14 +276,17 @@ class sourcemap():
         self.wu = self.skbio_wu.to_data_frame()
 
     def embed(self, method, out_csv, seed, n_comp=200):
-        """
+        """Distance matrix embedding
+
         Embedding of a distance matrix in lower dimensions
+
         Args:
-            - method(str): method used for embedding
-            - out_csv(str): Path to file for writing out embedding coordinates
-            - seed(int): seed for random number generator
-            - n_comp(int): dimension of embedding
+            method (str): embedding method
+            out_csv (str): Path to file for writing out embedding coordinates
+            seed (int): seed for random number generator
+            n_comp (int, optional): dimension of embedding. Defaults to 200.
         """
+
         cols = [f"PC{i}" for i in range(1, n_comp+1)]
 
         if method == 'UMAP':
@@ -311,17 +329,20 @@ class sourcemap():
         self.sink = self.my_embed.drop(self.train_samples, axis=0)
 
     def knn_classification(self, kfold, threads, seed):
-        """
+        """Performs KNN classification
+
         KNN machine learning to predict unknown proportion
         Correction of predicted probabilies with Platt scaling from sklearn
         Training on 64% of data, validation on 16%, test on 20%
+
         Args:
-            - kfold
-            - threads(int) number of threads for parallelization
-            - seed(int) seed for random number generator
+            kfold (int): number of cross validation folds
+            threads (int): number of processes for parallelization
+            seed (int): seed for random number generator
         Returns:
-            - predictions(dict): Probability/proportion of each class
+            predictions(dict): Probability/proportion of each class
         """
+
         train_features, test_features, train_labels, test_labels = train_test_split(
             self.source.drop('labels', axis=1), self.source.loc[:, 'labels'], test_size=0.2, random_state=seed)
         train_features, validation_features, train_labels, validation_labels = train_test_split(

@@ -7,13 +7,15 @@ import multiprocessing
 
 
 def RLE_normalize(pd_dataframe):
-    '''
-    Normalize with Relative Log Expression
-    INPUT:
-        pd_dataframe(pandas DataFrame): Colums as Samples, Rows as OTUs
-    OUTPUT:
-        step7(pandas DataFrame): RLE Normalized. Colums as Samples, Rows as OTUs
-    '''
+    """Normalize with Relative Log Expression
+
+    Args:
+        pd_dataframe (pandas DataFrame): OTU count dataframe,
+            colums as Samples, Rows as OTUs
+    Returns:
+        pandas DataFrame: RLE Normalized datafrane. Colums as Samples, Rows as OTUs
+    """
+
     step1 = pd_dataframe.apply(np.log, 0)
     step2 = step1.apply(np.average, 1)
     step3 = step2[step2.replace([np.inf, -np.inf], np.nan).notnull()]
@@ -27,27 +29,37 @@ def RLE_normalize(pd_dataframe):
 
 
 def subsample_normalize_pd(pd_dataframe):
-    '''
-    Normalize with Subsampling
-    INPUT:
-        pd_dataframe(pandas DataFrame): Colums as Samples, Rows as OTUs
-    OUTPUT:
-        step7(pandas DataFrame): SubSample Normalized. Colums as Samples, Rows as OTUs
-    '''
+    """Normalize with Subsampling
+
+    Args:
+        pd_dataframe (pandas DataFrame): OTU count dataframe,
+            colums as Samples, Rows as OTUs
+    Returns:
+       pandas DataFrame: Subsample Normalized dataframe. Colums as Samples, Rows as OTUs
+    """
+
     def subsample_normalize(serie, omax):
-        '''
+        """Subsample normalization column wise
+
         imin: minimum of input range
         imax: maximum of input range
         omin: minimum of output range
         omax: maximum of output range
-        x in [imin,imax]
+        x in [imin, imax]
         f(x) in [omin, omax]
 
                  x - imin
-        f(x) = ------------ x (omax - omin) + omin
+        f(x) = ------------ x(omax - omin) + omin
                imax - imin
 
-        '''
+
+        Args:
+            serie (pandas Series): Indivudal Sample Column
+            omax (int): maximum of output range
+        Returns:
+            pandas Series: normalized pandas Series
+        """
+
         imin = min(serie)
         imax = max(serie)
         omin = 0
@@ -67,18 +79,16 @@ def subsample_normalize_pd(pd_dataframe):
     return(step3)
 
 
-def CLR_normalize(pd_dataframe):
-    d = pd_dataframe
-    d = d+1
-    step1_1 = d.apply(np.log, 0)
-    step1_2 = step1_1.apply(np.average, 0)
-    step1_3 = step1_2.apply(np.exp)
-    step2 = d.divide(step1_3, 1)
-    step3 = step2.apply(np.log, 0)
-    return(step3)
-
-
 def gmpr_size_factor(col, ar):
+    """Generate GMPR size factor
+
+    Args:
+        col (list): individual columms of the numpy array
+        ar (numpy array): numpy array of OTU counts,
+            colums as Samples, Rows as OTUs
+    Returns:
+        float: GMPR size factor per column
+    """
     pr = np.apply_along_axis(lambda x: np.divide(ar[:, col], x), 0, ar)
     pr[np.isinf(pr)] = np.nan
     pr[pr == 0] = np.nan
@@ -87,12 +97,18 @@ def gmpr_size_factor(col, ar):
 
 
 def GMPR_normalize(df, process):
-    """
+    """Compute GMPR normalization
+
     Global Mean of Pairwise Ratios
     Chen, L., Reeve, J., Zhang, L., Huang, S., Wang, X., & Chen, J. (2018). 
     GMPR: A robust normalization method for zero-inflated count data 
     with application to microbiome sequencing data. 
     PeerJ, 6, e4600.
+
+    Args:
+        df (pandas Dataframe): OTU count dataframe,
+            colums as Samples, Rows as OTUs
+        process (int): number of process for parallelization
     """
     ar = np.asarray(df)
 

@@ -47,7 +47,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         '-n',
         dest="normalization",
         default='GMPR',
-        help="Normalization method (RLE | CLR | Subsample | GMPR). Default = GMPR")
+        help="Normalization method (RLE | Subsample | GMPR). Default = GMPR")
     parser.add_argument(
         '-dt',
         dest="distance",
