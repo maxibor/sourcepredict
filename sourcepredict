@@ -129,30 +129,30 @@ if __name__ == "__main__":
         sample = ''.join(list(s.columns))
         samp_pred[sample] = {}
         print(f"  == Sample: {sample} ==")
-        a = sourceunknown(source=SOURCES, sink=s, labels=LABELS)
+        su = sourceunknown(source=SOURCES, sink=s, labels=LABELS)
         print("\tAdding unknown")
-        a.add_unknown(alpha=ALPHA, seed=SEED)
+        su.add_unknown(alpha=ALPHA, seed=SEED)
         print(f"\tNormalizing ({normalization})")
-        a.normalize(method=normalization, threads=THREADS)
+        su.normalize(method=normalization, threads=THREADS)
         print("\tComputing Bray-Curtis distance")
-        a.compute_distance(rank=tax_rank)
+        su.compute_distance(rank=tax_rank)
         print(
             f"\tPerforming MDS embedding in {DIM} dimension{utils.plural(DIM)}")
-        a.embed(n_comp=DIM, seed=SEED, out_csv=EMBED_CSV)
+        su.embed(n_comp=DIM, seed=SEED, out_csv=EMBED_CSV)
 
         print("\tKNN machine learning")
-        pred = a.ml(seed=SEED, threads=THREADS)
+        pred = su.ml(seed=SEED, threads=THREADS)
         samp_pred[sample]['unknown'] = pred[sample]['unknown']
 
     print("Step 2: Checking for source proportion")
-    u = sourcemap(source=SOURCES, sink=SINK, labels=LABELS,
-                  norm_method=NORMALIZATION, threads=THREADS)
+    sm = sourcemap(source=SOURCES, sink=SINK, labels=LABELS,
+                   norm_method=NORMALIZATION, threads=THREADS)
     print(f"\tComputing {distance_method} distance on {tax_rank} rank")
-    u.compute_distance(distance_method=distance_method, rank=tax_rank)
+    sm.compute_distance(distance_method=distance_method, rank=tax_rank)
     print(f"\t{embed_method} embedding in {DIM} dimension{utils.plural(DIM)}")
-    u.embed(n_comp=DIM, method=embed_method, seed=SEED, out_csv=EMBED_CSV)
+    sm.embed(n_comp=DIM, method=embed_method, seed=SEED, out_csv=EMBED_CSV)
     print("\tKNN machine learning")
-    umap_pred = u.knn_classification(
+    umap_pred = sm.knn_classification(
         kfold=KFOLD, threads=THREADS, seed=SEED)
 
     prediction = utils.account_unk(samp_pred=samp_pred, umap_pred=umap_pred)
