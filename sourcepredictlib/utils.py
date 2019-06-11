@@ -69,7 +69,7 @@ def split_sinks(sink):
     Args:
        sink(pandas DataFrame): DataFrame of sink samples
     Returns:
-        list: List of indivudal sink columns as df
+        list of pandas Dataframes: List of indivudal sink columns as pandas Dataframes
     """
 
     sink_df = pd.read_csv(sink, index_col=0)
