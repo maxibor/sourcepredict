@@ -2,7 +2,7 @@
 title: 'Sourcepredict: Prediction of metagenomic sample sources using machine learning algorithms'
 tags:
   - microbiome
-  - sourcetracking
+  - source tracking
   - machine learning
 authors:
  - name: Maxime Borry
@@ -17,44 +17,44 @@ bibliography: paper.bib
 
 # Summary
 
-SourcePredict [(github.com/maxibor/sourcepredict)](https://github.com/maxibor/sourcepredict) is a Python Conda package to classify and predict the source of metagenomics sample given a reference dataset of known sources.  
+SourcePredict [(github.com/maxibor/sourcepredict)](https://github.com/maxibor/sourcepredict) is a Python Conda package to classify and predict the source of metagenomics sample given a reference dataset of known sources, a problem also known as source tracking.
 
-DNA shotgun sequencing of human, animal, and environmental samples opened up new doors to explore the diversity of life in these different environments, a field known as metagenomics [@metagenomics].  
-One of the aspect of metagenomics is to investigate the composition in organisms of a sequencing sample with tools known as taxonomic classifiers.
+DNA shotgun sequencing of human, animal, and environmental sample opened up new doors to explore the diversity of life in these different environments, a field known as metagenomics [@metagenomics].  
+One aspect of metagenomics is to investigate the community composition of organisms within a sequencing sample with tools known as taxonomic classifiers.
 These taxonomic classifiers, such as for example Kraken [@kraken], will compute the organism taxonomic composition, from the DNA sequencing data.
 
-When in most cases the origin of a metagenomic sample, its source, is known, it is often part of the research question to infer and/or confirm this source.
+In cases where the origin of a metagenomic sample, its source, is unknown, it is often part of the research question to predict and/or confirm this source.
 Using samples of known sources, a reference dataset can be established with the samples taxonomic composition, i.e. the organisms identified in the sample, as features, and the source of the sample as class labels.
-With this reference dataset, a machine learning algorithm can be trained to predict the source of unlabeled samples from their taxonomic composition.  
-Other tools to perform the prediction of a sample source exist, such as SourceTracker [@sourcetracker], which uses gibbs sampling. 
-However, with Sourcepredict using dimension reduction algorithms, followed by K-Nearest-Neighbors (KNN) classification, the intepretation of the results is made easier thanks to the visualation of the samples in a low dimensional space.
+With this reference dataset, a machine learning algorithm can be trained to predict the source of unknown samples (sinks) from their taxonomic composition.  
+Other tools to perform the prediction of a sample source exist, such as SourceTracker [@sourcetracker], which uses Gibbs sampling. 
+However, with Sourcepredict using a dimension reduction algorithm, followed by K-Nearest-Neighbors (KNN) classification, the interpretation of the results is made more straightforward thanks to the embedding of the samples in a human observable low dimensional space.
 
 
 ## Method
-Starting with two numerical organism count matrix (samples as columns, organisms as rows, obtained by a taxonomic classifier) of training and test data, training and test samples are first normalized together to correct for uneven sequencing depth using GMPR method (default) [@gmpr].
-After normalization, Sourcepredict performs a two steps prediction: first a prediction of the proportion of unknown sources, i.e. not represented in the reference dataset. Then a prediction of the proportion of each known source of the reference dataset in the test samples.
+Starting with a numerical organism count matrix (samples as columns, organisms as rows, obtained by a taxonomic classifier) of merged references and sinks datasets, samples are first normalized relative to each other, to correct for uneven sequencing depth using the GMPR method (default) [@gmpr].
+After normalization, Sourcepredict performs a two-step prediction: first, a prediction of the proportion of unknown sources, i.e. not represented in the reference dataset. Then a prediction of the proportion of each known source of the reference dataset in the sink samples.
 
-Organism are represented by their taxonomic identifiers (TAXID).
+Organisms are represented by their taxonomic identifiers (TAXID).
 
 ### Prediction of unknown sources proportion
 
 
-Let $S_i \in \{S_1, .., S_n\}$ be a sample of size $O$ organisms $o_j$ from the normalized test dataset $D_{sink}$, with $o_j \in \mathbb{Z}+$, and $j\in[1,O]$.  
+Let $S_i \in \{S_1, .., S_n\}$ be a sample of size $O$ organisms $o_j$ from the normalized sinks dataset $D_{sink}$, with $o_j \in \mathbb{Z}+$, and $j\in[1,O]$.  
 Let $m$ be the mean number of samples per class in the reference dataset, such as $m = \frac{1}{O}\sum_{i=1}^{O}S_i$.  
-I define $|m|$ estimated samples $U_k$ to add to the training dataset to account for the unknown source proportion in a test sample, with $k \in \{1,..,|m|\}$.  
+I define $|m|$ estimated samples $U_k$ to add to the reference dataset to account for the unknown source proportion in a test sample, with $k \in \{1,..,|m|\}$.  
 
-To compute each $U_k$, a $\alpha$ proportion ($\alpha \in [0,1]$, default = $0.1$) of each $o_j$ organism is added to the training dataset for each $U_k$ samples, such that $U_k(o_j) = \alpha \cdot x_{i \ j}$ , where $x_{i \ j}$ is sampled from the Gaussian distribution $\mathcal{N}\big(\mu=S_i(o_j), \sigma=0.1\big)$.
+To compute each $U_k$, a $\alpha$ proportion ($\alpha \in [0,1]$, default = $0.1$) of each $o_j$ organism is added for each $U_k$ samples of the reference dataset, such that $U_k(o_j) = \alpha \cdot x_{i \ j}$ , where $x_{i \ j}$ is sampled from the Gaussian distribution $\mathcal{N}\big(\mu=S_i(o_j), \sigma=0.1\big)$.
 
 The $|m|$ $U_k$ samples are then added to the reference dataset $D_{ref}$, and labeled as *unknown*, to create a new reference dataset denoted $D_{ref\ u}$.
 
 To predict the proportion of unknown sources, a distance matrix of the samples is computed using the scikit-bio implementation of the Bray-Curtis dissimilarity [@bray-curtis]. This distance matrix is then embedded in two dimensions (default) with the scikit-bio implementation of PCoA.  
 This sample embedding is divided into three subsets: $D_{train\ u}$ ($64\%$), $D_{test\ u}$ ($20\%$), and $D_{validation\ u}$($16\%$). 
  
-The scikit-learn implementation of KNN algorithm is then trained on $D_{train\ u}$, and the test accuracy is computed with $D_{test\ u}$ .  
+The scikit-learn implementation of KNN algorithm is then trained on $D_{train\ u}$, and the test accuracy is computed with $D_{test\ u} $.  
 This trained KNN model is then corrected for probability estimation of unknown proportion using the scikit-learn implementation of the Platt's scaling method [@platt] with $D_{validation\ u}$.
 This procedure is repeated for each $S_i$ sample of the test dataset  $D_{sink}$.
 
-$p_u$ is then estimated using this trained and corrected KNN mode, where $p_u \in [0,1]$ is the proportion of unknown sources in each $S_i$ sample. 
+$p_u$ is then estimated using this trained and corrected KNN model, where $p_u \in [0,1]$ is the proportion of unknown sources in each $S_i$ sample. 
 
 ### Prediction of known source proportion
 
@@ -79,6 +79,7 @@ Finally, a summary table gathering the estimated sources proportions is exported
 
 ## Acknowledgements
 
-Thanks to Dr. Alexander Herbig, Dr. Adam Ben Rohrlach, and Alexander Hübner for their valuable comments and for proofreading this manuscript.
+Thanks to Dr. Christina Warinner, Dr. Alexander Herbig, Dr. Adam Ben Rohrlach, and Alexander Hübner for their valuable comments and for proofreading this manuscript.
+This work was funded by the Max Planck Society.
 
 # References
