@@ -17,69 +17,71 @@ bibliography: paper.bib
 
 # Summary
 
-SourcePredict [(github.com/maxibor/sourcepredict)](https://github.com/maxibor/sourcepredict) is a Python Conda package to classify and predict the source of metagenomics sample given a reference dataset of known sources, a problem also known as source tracking.
+SourcePredict [(github.com/maxibor/sourcepredict)](https://github.com/maxibor/sourcepredict) is a Python Conda package to classify and predict the origin of metagenomic samples, given a reference dataset of known origins, a problem also known as source tracking.
 
-DNA shotgun sequencing of human, animal, and environmental sample opened up new doors to explore the diversity of life in these different environments, a field known as metagenomics [@metagenomics].  
-One aspect of metagenomics is to investigate the community composition of organisms within a sequencing sample with tools known as taxonomic classifiers.
-These taxonomic classifiers, such as for example Kraken [@kraken], will compute the organism taxonomic composition, from the DNA sequencing data.
+DNA shotgun sequencing of human, animal, and environmental samples has opened up new doors to explore the diversity of life in these different environments, a field known as metagenomics [@metagenomics].  
+One aspect of metagenomics is investigating the community composition of organisms within a sequencing sample with tools known as taxonomic classifiers.
+These taxonomic classifiers, such as Kraken [@kraken], will compute the organism taxonomic composition from the DNA sequencing data.
 
-In cases where the origin of a metagenomic sample, its source, is unknown, it is often part of the research question to predict and/or confirm this source.
-Using samples of known sources, a reference dataset can be established with the samples taxonomic composition, i.e. the organisms identified in the sample, as features, and the source of the sample as class labels.
+In cases where the origin of a metagenomic sample, its source, is unknown, it is often part of the research question to predict and/or confirm the source.
+Using samples of known sources, a reference dataset can be established with the taxonomic composition of the samples, *i.e.* the organisms identified in the samples as features, and the sources of the samples as class labels.
 With this reference dataset, a machine learning algorithm can be trained to predict the source of unknown samples (sinks) from their taxonomic composition.  
-Other tools to perform the prediction of a sample source exist, such as SourceTracker [@sourcetracker], which uses Gibbs sampling. 
+Other tools used to perform the prediction of a sample source already exist, such as SourceTracker [@sourcetracker], which employs Gibbs sampling. 
 However, with Sourcepredict using a dimension reduction algorithm, followed by K-Nearest-Neighbors (KNN) classification, the interpretation of the results is made more straightforward thanks to the embedding of the samples in a human observable low dimensional space.
 
 
 ## Method
 Starting with a numerical organism count matrix (samples as columns, organisms as rows, obtained by a taxonomic classifier) of merged references and sinks datasets, samples are first normalized relative to each other, to correct for uneven sequencing depth using the GMPR method (default) [@gmpr].
-After normalization, Sourcepredict performs a two-step prediction: first, a prediction of the proportion of unknown sources, i.e. not represented in the reference dataset. Then a prediction of the proportion of each known source of the reference dataset in the sink samples.
+After normalization, Sourcepredict performs a two-step prediction algorithm. First, it predicts the proportion of unknown sources, *i.e.* which are not represented in the reference dataset. Second it predicts the proportion of each known source of the reference dataset in the sink samples.
 
 Organisms are represented by their taxonomic identifiers (TAXID).
 
 ### Prediction of unknown sources proportion
 
 
-Let $S_i \in \{S_1, .., S_n\}$ be a sample of size $O$ organisms $o_j$ from the normalized sinks dataset $D_{sink}$, with $o_j \in \mathbb{Z}+$, and $j\in[1,O]$.  
-Let $m$ be the mean number of samples per class in the reference dataset, such as $m = \frac{1}{O}\sum_{i=1}^{O}S_i$.  
-I define $|m|$ estimated samples $U_k$ to add to the reference dataset to account for the unknown source proportion in a test sample, with $k \in \{1,..,|m|\}$.  
+Let $S_i \in \{S_1, .., S_n\}$ be a sample from the normalized sinks dataset $D_{sink}$,  $o_{j}^{\ i} \in \{o_{1}^{\ i},.., o_{n_o^{\ i}}^{\ i}\}$ be an organism in $S_i$, and $n_o^{\ i}$ be the total number of organisms in $S_i$, with $o_{j}^{\ i} \in \mathbb{Z}+$.  
+Let $m$ be the mean number of samples per class in the reference dataset, such that $m = \frac{1}{O}\sum_{i=1}^{O}S_i$.  
+For each  $S_i$ samples, I define $||m||$ estimated samples $U_k^{S_i} \in \{U_1^{S_i}, ..,U_{||m||}^{S_i}\} $ to add to the reference dataset to account for the unknown source proportion in a test sample.
 
-To compute each $U_k$, a $\alpha$ proportion ($\alpha \in [0,1]$, default = $0.1$) of each $o_j$ organism is added for each $U_k$ samples of the reference dataset, such that $U_k(o_j) = \alpha \cdot x_{i \ j}$ , where $x_{i \ j}$ is sampled from the Gaussian distribution $\mathcal{N}\big(\mu=S_i(o_j), \sigma=0.1\big)$.
+Separately for each $S_i$, a proportion denoted $\alpha \in [0,1]$ (default = $0.1$) of each of the $o_{j}^{\ i}$ organism of $S_i$ is added to each $U_k^{S_i}$ samples such that $U_k^{S_i}(o_j^{\ i}) = \alpha \cdot x_{i \ j}$ , where $x_{i \ j}$ is sampled from a Gaussian distribution $\mathcal{N}\big(S_i(o_j^{\ i}), 0.01)$.
 
-The $|m|$ $U_k$ samples are then added to the reference dataset $D_{ref}$, and labeled as *unknown*, to create a new reference dataset denoted $D_{ref\ u}$.
+The $||m||$ $U_k^{S_i}$ samples are then added to the reference dataset $D_{ref}$, and labeled as *unknown*, to create a new reference dataset denoted ${}^{unk}D_{ref}$.
 
-To predict the proportion of unknown sources, a distance matrix of the samples is computed using the scikit-bio implementation of the Bray-Curtis dissimilarity [@bray-curtis]. This distance matrix is then embedded in two dimensions (default) with the scikit-bio implementation of PCoA.  
-This sample embedding is divided into three subsets: $D_{train\ u}$ ($64\%$), $D_{test\ u}$ ($20\%$), and $D_{validation\ u}$($16\%$). 
+To predict the proportion of unknown sources, a Bray-Curtis [@bray-curtis] pairwise dissimilarity matrix of the samples is computed using scikit-bio. This distance matrix is then embedded in two dimensions (default) with the scikit-bio implementation of PCoA.  
+This sample embedding is divided into three subsets: ${}^{unk}D_{train}$ ($64\%$), ${}^{unk}D_{test}$ ($20\%$), and ${}^{unk}D_{validation}$($16\%$). 
  
-The scikit-learn implementation of KNN algorithm is then trained on $D_{train\ u}$, and the test accuracy is computed with $D_{test\ u} $.  
-This trained KNN model is then corrected for probability estimation of unknown proportion using the scikit-learn implementation of the Platt's scaling method [@platt] with $D_{validation\ u}$.
-This procedure is repeated for each $S_i$ sample of the test dataset  $D_{sink}$.
+The scikit-learn implementation of KNN algorithm is then trained on ${}^{unk}D_{train}$, and the training accuracy is computed with ${}^{unk}D_{test}$.  
+This trained KNN model is then corrected for probability estimation of the unknown proportion using the scikit-learn implementation of Platt's scaling method [@platt] with ${}^{unk}D_{validation}$.
 
-$p_u$ is then estimated using this trained and corrected KNN model, where $p_u \in [0,1]$ is the proportion of unknown sources in each $S_i$ sample. 
+The proportion of unknown sources in $S_i$, $p_u \in [0,1]$ is then estimated using this trained and corrected KNN model.
+
+Ultimately, this process is repeated independantly for each sink $S_i$ sample of $D_{sink}$.
 
 ### Prediction of known source proportion
 
-First, only organism TAXID corresponding to the *species* taxonomic level are kept using ETE toolkit [@ete3].
-A distance matrix is then computed on the merged training dataset $D_{ref}$ and test dataset $D_{sink}$ using the scikit-bio implementation of weighted Unifrac distance (default) [@wu].
+First, only organism TAXIDs corresponding to the species taxonomic level are kept using the ETE toolkit [@ete3].
+A weighted Unifrac (default) [@wu] pairwise distance  matrix is then computed on the merged training dataset $D_{ref}$ and test dataset $D_{sink}$ with scikit-bio.
 
-The distance matrix is embedded in two dimensions using the scikit-learn implementation of t-SNE [@tsne].
+This distance matrix is then embedded in two dimensions (default) using the scikit-learn implementation of t-SNE [@tsne].
 
-The 2-dimensional embedding is then split back to training $D_{ref\ t}$ and testing dataset $D_{sink\ t}$.
+The 2-dimensional embedding is then split back to training ${}^{tsne}D_{ref}$ and testing dataset ${}^{tsne}D_{sink}$.
 
-The training dataset $D_{ref\ tsne}$ is further divided into three subsets: $D_{train\ t}$ ($64\%$), $D_{test\ t}$ ($20\%$), and $D_{validation\ t}$ ($16\%$).  
-The KNN algorithm is then trained on the train subset, and the test accuracy is computed with $D_{test\ t}$.  
-This trained KNN model is then corrected for source proportion estimation using the scikit-learn implementation of the Platt's method with $D_{validation\ t}$.
+The training dataset ${}^{tsne}D_{ref}$ is further divided into three subsets: ${}^{tsne}D_{train}$ ($64\%$), ${}^{tsne}D_{test}$ ($20\%$), and ${}^{tsne}D_{validation}$ ($16\%$).  
+The KNN algorithm is then trained on the train subset, with a five (default) cross validation to look for the optimum number of K-neighbors.
+The training accuracy is then computed with ${}^{tsne}D_{test}$.
+Finally, this second trained KNN model is also corrected for source proportion estimation using the scikit-learn implementation of the Platt's method with ${}^{tsne}D_{validation}$.
 
-$p_{c}$ is then estimated using this trained and corrected KNN model, where $p_{c} \in [0,1]$ is the proportion of each of source $c$ in each sample $S_i$.
+The proportion $p_{c_s} \in [0,1]$ of each of the $n_s$ sources $c_s \in \{c_{1},\ ..,\ c_{n_s}\}$  in each sample $S_i$ is then estimated using this second trained and corrected KNN model.
 
 ### Combining unknown and source proportion
 
-Finally, for each sample $S_i$ of the test dataset $D_{sink}$, the predicted unknown proportion $p_{u}$ is then combined with the predicted proportion $p_{c}$ for each of the $C$ sources $c$ of the training dataset such that $\sum_{c=1}^{C} s_c + p_u = 1$ where $s_c = p_c \cdot p_u$.
+Finally, for each sample $S_i$ of the test dataset $D_{sink}$, the predicted unknown proportion $p_{u}$ is then combined with the predicted proportion $p_{c_s}$ for each of the $n_s$ sources $c_s$ of the training dataset such that $\sum_{c_s=1}^{n_s} s_c + p_u = 1$ where $s_c = p_{c_s} \cdot p_u$.
 
-Finally, a summary table gathering the estimated sources proportions is exported as a `csv` file, as well as the t-SNE embedding samples coordinates.
+Finally, a summary table gathering the estimated sources proportions is returned as a `csv` file, as well as the t-SNE embedding sample coordinates.
 
 ## Acknowledgements
 
-Thanks to Dr. Christina Warinner, Dr. Alexander Herbig, Dr. Adam Ben Rohrlach, and Alexander Hübner for their valuable comments and for proofreading this manuscript.
-This work was funded by the Max Planck Society.
+Thanks to Dr. Christina Warinner, Dr. Alexander Herbig, Dr. AB Rohrlach, and Alexander Hübner for their valuable comments and for proofreading this manuscript.
+This work was funded by the Max Planck Society and the Deutsche Forschungsgemeinschaft, project code: EXC 2051 #390713860.
 
 # References
