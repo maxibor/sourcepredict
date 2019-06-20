@@ -14,6 +14,8 @@ def RLE_normalize(pd_dataframe):
             colums as Samples, Rows as OTUs
     Returns:
         pandas DataFrame: RLE Normalized datafrane. Colums as Samples, Rows as OTUs
+    Example:
+        >>> RLE_normalize(pd.DataFrame)
     """
 
     step1 = pd_dataframe.apply(np.log, 0)
@@ -83,7 +85,7 @@ def gmpr_size_factor(col, ar):
     """Generate GMPR size factor
 
     Args:
-        col (list): individual columms of the numpy array
+        col (int): columm index of the numpy array
         ar (numpy array): numpy array of OTU counts,
             colums as Samples, Rows as OTUs
     Returns:

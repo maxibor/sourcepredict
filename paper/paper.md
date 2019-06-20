@@ -1,5 +1,5 @@
 ---
-title: 'Sourcepredict: Prediction of metagenomic sample sources using machine learning algorithms'
+title: 'Sourcepredict: Prediction of metagenomic sample sources using dimension reduction followed by machine learning classification'
 tags:
   - microbiome
   - source tracking

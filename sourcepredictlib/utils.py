@@ -88,6 +88,9 @@ def check_norm(method):
         method(str): Normalization method
     Returns:
         str: capitalized normalization method name
+    Example:
+        >>> check_norm('rle')
+        'RLE'
     """
 
     methods = ['RLE', 'SUBSAMPLE', 'GMPR']
@@ -106,6 +109,9 @@ def check_embed(method):
         method(str): Embedding method
     Returns:
         str: capitalized embedding method name
+    Example:
+        >>> check_embed('tsne')
+        'TSNE'
     """
 
     methods = ['TSNE', 'UMAP', 'MDS']
@@ -124,6 +130,9 @@ def check_distance(method):
         method(str): distance method
     Returns:
         str: capitalized distance method name
+    Example:
+        >>> check_distance('Weighted_unifrac')
+        'weighted_unifrac'
     """
 
     methods = ['weighted_unifrac', 'unweighted_unifrac']
@@ -146,6 +155,9 @@ def check_gen_seed(seed, amin=1, amax=10000):
             Defaults to 10000.
     Returns:
         int: random seed sampled between 1 and 10000
+    Example:
+        >>> check_gen_seed(42)
+        42
     """
 
     if seed is None:
@@ -161,6 +173,9 @@ def plural(count):
         count(int): number of occurences
     Returns:
         str: '' or 's'
+    Example:
+        >>> plural(3)
+        's'
     """
 
     if count == 1:
@@ -178,6 +193,9 @@ def _get_basename(file_name):
         file_name(str): path to file
     Returns:
         str: file basename
+    Example:
+        >>> _get_basename('/path/to/myfile.txt')
+        'myfile'
     """
 
     if ("/") in file_name:

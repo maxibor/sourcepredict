@@ -16,12 +16,18 @@ from ete3 import NCBITaxa
 from io import StringIO
 import umap
 import warnings
+import os
 import sys
-
 from collections import Counter
-from . import normalize
 
-from . import utils
+
+parentScriptDir = "/".join(os.path.dirname(
+    os.path.realpath(__file__)).split("/")[:-1])
+sys.path.append(parentScriptDir+"/sourcepredictlib")
+
+import normalize
+
+import utils
 
 
 class sourceunknown():
@@ -54,7 +60,7 @@ class sourceunknown():
         return(f'A sourceforest object of source {self.ref} and sink {self.tmp_sink}')
 
     def add_unknown(self, alpha, seed):
-        """Add unkown
+        """Add unknown samples
 
         Create unknown Samples from test sample
         N Random samples are created with N being average of class counts
