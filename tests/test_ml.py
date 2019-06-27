@@ -142,9 +142,12 @@ def test_sourcemap_embed_UMAP(sm):
     sm.compute_distance(distance_method='weighted_unifrac', rank='species')
     sm.embed(n_comp=2, method='UMAP', seed=42, out_csv=None)
 
-    assert generate_pd_md5(sm.my_embed) == '76fa6131ff850228da5226e560dc0bfd'
-    assert generate_pd_md5(sm.ref_t) == 'ee35d3c877530e8ed361c3c71475b026'
-    assert generate_pd_md5(sm.sink_t) == 'ed4e993c4ee284735d9fd6cd4e6b71eb'
+    assert generate_pd_md5(sm.my_embed) in [
+        '76fa6131ff850228da5226e560dc0bfd', 'bc318da9b97c67995cabb6871d5df0c6']
+    assert generate_pd_md5(sm.ref_t) in [
+        'ee35d3c877530e8ed361c3c71475b026', '6b5f99a377e863b901f8457a56539eaa']
+    assert generate_pd_md5(sm.sink_t) in [
+        'ed4e993c4ee284735d9fd6cd4e6b71eb', 'de2d0e5734898f8bc91bef1f5431ad27']
 
 
 def test_sourcemap_embed_MDS(sm):
