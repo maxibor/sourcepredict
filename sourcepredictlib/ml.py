@@ -148,7 +148,7 @@ class sourceunknown():
             self.normalized_rank.index))
         self.bc = self.skbio_bc.to_data_frame()
 
-    def embed(self, out_csv, seed, n_comp=200):
+    def embed(self, seed, n_comp=200, out_csv=None):
         """
 
         Embedding of a distance matrix in lower dimensions
