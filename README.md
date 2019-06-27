@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/maxibor/sourcepredict.svg?token=pwT9AgYi4qJY4LTp9WUy&branch=master)](https://travis-ci.com/maxibor/sourcepredict) [![Anaconda-Server Badge](https://anaconda.org/maxibor/sourcepredict/badges/installer/conda.svg)](https://conda.anaconda.org/maxibor) [![Documentation Status](https://readthedocs.org/projects/sourcepredict/badge/?version=latest)](https://sourcepredict.readthedocs.io/en/latest/?badge=latest)
+[![Build Status](https://travis-ci.com/maxibor/sourcepredict.svg?token=pwT9AgYi4qJY4LTp9WUy&branch=master)](https://travis-ci.com/maxibor/sourcepredict) [![Coverage Status](https://coveralls.io/repos/github/maxibor/sourcepredict/badge.svg?branch=master)](https://coveralls.io/github/maxibor/sourcepredict?branch=master) [![Anaconda-Server Badge](https://anaconda.org/maxibor/sourcepredict/badges/installer/conda.svg)](https://conda.anaconda.org/maxibor) [![Documentation Status](https://readthedocs.org/projects/sourcepredict/badge/?version=latest)](https://sourcepredict.readthedocs.io/en/latest/?badge=latest)
 
 
 <img src="img/sourcepredict_logo.png" width="300">
