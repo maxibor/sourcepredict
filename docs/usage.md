@@ -1,18 +1,21 @@
 # Usage
 
 ```bash
-$ python sourcepredict -h
-usage: SourcePredict v0.32 [-h][-a alpha] [-s SOURCES][-l labels]
-                           [-n NORMALIZATION][-dt distance] [-me METHOD][-e embed] [-di DIM][-o output] [-se SEED][-k kfold] [-t THREADS]
+$ sourcepredict -h
+usage: SourcePredict v0.33 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
+                           [-n NORMALIZATION] [-dt DISTANCE] [-me METHOD]
+                           [-e EMBED] [-di DIM] [-o OUTPUT] [-se SEED]
+                           [-k KFOLD] [-t THREADS]
                            otu_table
 
 ==========================================================
-SourcePredict v0.32
+SourcePredict v0.33
 Coprolite source classification
 Author: Maxime Borry
-Contact: &lt;borry[at]shh.mpg.de>
+Contact: <borry[at]shh.mpg.de>
+Homepage & Documentation: github.com/maxibor/sourcepredict
+==========================================================
 
-# Homepage & Documentation: github.com/maxibor/sourcepredict
 
 positional arguments:
   otu_table         path to otu table in csv format
@@ -24,8 +27,8 @@ optional arguments:
                     data/modern_gut_microbiomes_sources.csv
   -l LABELS         Path to labels csv file. Default =
                     data/modern_gut_microbiomes_labels.csv
-  -n NORMALIZATION  Normalization method (RLE | CLR | Subsample | GMPR).
-                    Default = GMPR
+  -n NORMALIZATION  Normalization method (RLE | Subsample | GMPR). Default =
+                    GMPR
   -dt DISTANCE      Distance method. (unweighted_unifrac | weighted_unifrac)
                     Default = weighted_unifrac
   -me METHOD        Embedding Method. TSNE or UMAP. Default = TSNE
@@ -33,10 +36,10 @@ optional arguments:
   -di DIM           Number of dimensions to retain for dimension reduction.
                     Default = 2
   -o OUTPUT         Output file basename. Default =
-                    &lt;sample_basename>.sourcepredict.csv
+                    <sample_basename>.sourcepredict.csv
   -se SEED          Seed for random generator. Default = 42
-  -k KFOLD          Number of fold for K-fold cross validation in feature
-                    selection and parameter optimization. Default = 5
+  -k KFOLD          Number of fold for K-fold cross validation in parameter
+                    optimization. Default = 5
   -t THREADS        Number of threads for parallel processing. Default = 2
 
 ```

@@ -7,14 +7,14 @@ Prediction/source tracking of metagenomic samples source using machine learning
 
 ----
 
-[SourcePredict](https://github.com/maxibor/sourcepredict) is a Python package to classify and predict the source of metagenomics sample given a training set.  
+SourcePredict [(github.com/maxibor/sourcepredict)](https://github.com/maxibor/sourcepredict) is a Python Conda package to classify and predict the origin of metagenomic samples, given a reference dataset of known origins, a problem also known as source tracking.
 
-The DNA shotgun sequencing of human, animal, and environmental samples opened up new doors to explore the diversity of life in these different environments, a field known as metagenomics.  
-One of the goals of metagenomics is to look at the composition of a sequencing sample with tools known as taxonomic classifiers.
-These taxonomic classifiers, such as Kraken for example, will compute the taxonomic composition in Operational Taxonomic Unit (OTU), from the DNA sequencing data.
+DNA shotgun sequencing of human, animal, and environmental samples has opened up new doors to explore the diversity of life in these different environments, a field known as metagenomics.  
+One aspect of metagenomics is investigating the community composition of organisms within a sequencing sample with tools known as taxonomic classifiers.
+These taxonomic classifiers, such as [Kraken](https://ccb.jhu.edu/software/kraken/), will compute the organism taxonomic composition from the DNA sequencing data.
 
-When in most cases the origin of a metagenomic sample is known, it is sometimes part of the research question to infer and/or confirm its source.  
-Using samples of known sources, a training set can be established with the OTU sample composition as features, and the source of the sample as class labels.  
-With this training set, a machine learning algorithm can be trained to predict the source of unlabeled samples from their OTU taxonomic composition.
-
-SourcePredict performs the classification/prediction of unlabeled samples sources from their OTU taxonomic compositions.
+In cases where the origin of a metagenomic sample, its source, is unknown, it is often part of the research question to predict and/or confirm the source.
+Using samples of known sources, a reference dataset can be established with the taxonomic composition of the samples, *i.e.* the organisms identified in the samples as features, and the sources of the samples as class labels.
+With this reference dataset, a machine learning algorithm can be trained to predict the source of unknown samples (sinks) from their taxonomic composition.  
+Other tools used to perform the prediction of a sample source already exist, such as SourceTracker [sourcetracker](https://www.nature.com/articles/nmeth.1650), which employs Gibbs sampling.
+However, with Sourcepredict using a dimension reduction algorithm, followed by K-Nearest-Neighbors (KNN) classification, the interpretation of the results is made more straightforward thanks to the embedding of the samples in a human observable low dimensional space.

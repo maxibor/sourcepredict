@@ -74,7 +74,7 @@ The documentation of SourcePredict is available here: [sourcepredict.readthedocs
 ### Environments included in the default source file
 
 - *Homo sapiens* gut microbiome
-- *Canis familiaris* gut microbiom
+- *Canis familiaris* gut microbiome
 - Soil microbiome
 
 ### Updating the source file 
