@@ -38,29 +38,28 @@ Organisms are represented by their taxonomic identifiers (TAXID).
 
 ### Prediction of unknown sources proportion
 
-
 Let $S_i \in \{S_1, .., S_n\}$ be a sample from the normalized sinks dataset $D_{sink}$,  $o_{j}^{\ i} \in \{o_{1}^{\ i},.., o_{n_o^{\ i}}^{\ i}\}$ be an organism in $S_i$, and $n_o^{\ i}$ be the total number of organisms in $S_i$, with $o_{j}^{\ i} \in \mathbb{Z}+$.  
 Let $m$ be the mean number of samples per class in the reference dataset, such that $m = \frac{1}{O}\sum_{i=1}^{O}S_i$.  
-For each  $S_i$ samples, I define $||m||$ estimated samples $U_k^{S_i} \in \{U_1^{S_i}, ..,U_{||m||}^{S_i}\} $ to add to the reference dataset to account for the unknown source proportion in a test sample.
+For each  $S_i$ sample, I define $||m||$ estimated samples $U_k^{S_i} \in \{U_1^{S_i}, ..,U_{||m||}^{S_i}\}$ to add to the reference dataset to account for the unknown source proportion in a test sample.
 
 Separately for each $S_i$, a proportion denoted $\alpha \in [0,1]$ (default = $0.1$) of each of the $o_{j}^{\ i}$ organism of $S_i$ is added to each $U_k^{S_i}$ samples such that $U_k^{S_i}(o_j^{\ i}) = \alpha \cdot x_{i \ j}$ , where $x_{i \ j}$ is sampled from a Gaussian distribution $\mathcal{N}\big(S_i(o_j^{\ i}), 0.01)$.
 
 The $||m||$ $U_k^{S_i}$ samples are then added to the reference dataset $D_{ref}$, and labeled as *unknown*, to create a new reference dataset denoted ${}^{unk}D_{ref}$.
 
-To predict the proportion of unknown sources, a Bray-Curtis [@bray-curtis] pairwise dissimilarity matrix of the samples is computed using scikit-bio. This distance matrix is then embedded in two dimensions (default) with the scikit-bio implementation of PCoA.  
+To predict the proportion of unknown sources, a Bray-Curtis [@bray-curtis] pairwise dissimilarity matrix of all $S_i$ and $U_k^{S_i}$ samples is computed using scikit-bio. This distance matrix is then embedded in two dimensions (default) with the scikit-bio implementation of PCoA.  
 This sample embedding is divided into three subsets: ${}^{unk}D_{train}$ ($64\%$), ${}^{unk}D_{test}$ ($20\%$), and ${}^{unk}D_{validation}$($16\%$). 
- 
+
 The scikit-learn implementation of KNN algorithm is then trained on ${}^{unk}D_{train}$, and the training accuracy is computed with ${}^{unk}D_{test}$.  
 This trained KNN model is then corrected for probability estimation of the unknown proportion using the scikit-learn implementation of Platt's scaling method [@platt] with ${}^{unk}D_{validation}$.
 
 The proportion of unknown sources in $S_i$, $p_u \in [0,1]$ is then estimated using this trained and corrected KNN model.
 
-Ultimately, this process is repeated independantly for each sink $S_i$ sample of $D_{sink}$.
+Ultimately, this process is repeated independantly for each sink sample $S_i$ of $D_{sink}$.
 
 ### Prediction of known source proportion
 
-First, only organism TAXIDs corresponding to the species taxonomic level are kept using the ETE toolkit [@ete3].
-A weighted Unifrac (default) [@wu] pairwise distance  matrix is then computed on the merged training dataset $D_{ref}$ and test dataset $D_{sink}$ with scikit-bio.
+First, only organism TAXIDs corresponding to the species taxonomic level are retained using the ETE toolkit [@ete3].
+A weighted Unifrac (default) [@wu] pairwise distance  matrix is then computed on the merged and normalized training dataset $D_{ref}$ and test dataset $D_{sink}$ with scikit-bio.
 
 This distance matrix is then embedded in two dimensions (default) using the scikit-learn implementation of t-SNE [@tsne].
 
@@ -75,7 +74,7 @@ The proportion $p_{c_s} \in [0,1]$ of each of the $n_s$ sources $c_s \in \{c_{1}
 
 ### Combining unknown and source proportion
 
-Finally, for each sample $S_i$ of the test dataset $D_{sink}$, the predicted unknown proportion $p_{u}$ is then combined with the predicted proportion $p_{c_s}$ for each of the $n_s$ sources $c_s$ of the training dataset such that $\sum_{c_s=1}^{n_s} s_c + p_u = 1$ where $s_c = p_{c_s} \cdot p_u$.
+Then for each sample $S_i$ of the test dataset $D_{sink}$, the predicted unknown proportion $p_{u}$ is then combined with the predicted proportion $p_{c_s}$ for each of the $n_s$ sources $c_s$ of the training dataset such that $\sum_{c_s=1}^{n_s} s_c + p_u = 1$ where $s_c = p_{c_s} \cdot p_u$.
 
 Finally, a summary table gathering the estimated sources proportions is returned as a `csv` file, as well as the t-SNE embedding sample coordinates.
 
