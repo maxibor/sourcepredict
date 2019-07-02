@@ -82,7 +82,7 @@ Path to source `csv` (training) file with samples in columns, and OTUs in rows. 
 +-------+----------+----------+
 ```
 
-### -s LABELS
+### -l LABELS
 
 Path to labels `csv` file of sources.
 Default = `data/modern_gut_microbiomes_labels.csv`
@@ -133,7 +133,7 @@ _Example:_
 
 ### -di DIM
 
-Number of dimensions to retain for dimension reduction by embedding with UMAP or TSNE. Default = `2`
+Number of dimensions to retain for dimension reduction. Default = `2`
 
 _Example:_
 
@@ -157,7 +157,7 @@ _Example:_
 
 ### -k KFOLD
 
-Number of fold for K-fold cross validation in in parameter optimization. Default = `5`
+Number of fold for K-fold cross validation in parameter optimization. Default = `5`
 
 _Example:_
 
