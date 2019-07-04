@@ -8,7 +8,7 @@ Prediction/classification of the origin of a metagenomics sample.
 ## Installation
 
 ```
-$ conda install -c etetoolkit -c bioconda -c maxibor sourcepredict
+$ conda install -c conda-forge -c etetoolkit -c bioconda -c maxibor sourcepredict
 ```
 
 ## Example
