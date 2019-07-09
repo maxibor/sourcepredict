@@ -146,7 +146,7 @@ if __name__ == "__main__":
 
     print("Step 2: Checking for source proportion")
     sm = sourcemap(source=SOURCES, sink=SINK, labels=LABELS,
-                   norm_method=NORMALIZATION, threads=THREADS)
+                   norm_method=normalization, threads=THREADS)
     print(f"\tComputing {distance_method} distance on {tax_rank} rank")
     sm.compute_distance(distance_method=distance_method, rank=tax_rank)
     print(f"\t{embed_method} embedding in {DIM} dimension{utils.plural(DIM)}")

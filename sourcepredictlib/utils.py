@@ -96,7 +96,7 @@ def check_norm(method):
     methods = ['RLE', 'SUBSAMPLE', 'GMPR']
     method = method.upper()
     if method not in methods:
-        print("Please check the normalization method (RLE or Subsample)")
+        print("Please check the normalization method (GMPR, RLE, or Subsample)")
         sys.exit(1)
     else:
         return(method)
