@@ -21,7 +21,8 @@ __ homepage_
    results
    methods
    custom_sources
-
+   add_new_sources
+   run_example
 
 
 Indices and tables
