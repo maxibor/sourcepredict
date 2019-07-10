@@ -60,7 +60,7 @@ Ultimately, this process is repeated independantly for each sink sample $S_i$ of
 ### Prediction of known source proportion
 
 First, only organism TAXIDs corresponding to the species taxonomic level are retained using the ETE toolkit [@ete3].
-A weighted Unifrac (default) [@wu] pairwise distance  matrix is then computed on the merged and normalized training dataset $D_{ref}$ and test dataset $D_{sink}$ with scikit-bio.
+A weighted Unifrac (default) [@wu] pairwise distance matrix is then computed on the merged and normalized training dataset $D_{ref}$ and test dataset $D_{sink}$ with scikit-bio, using the NCBI taxonomy as a reference tree.
 
 This distance matrix is then embedded in two dimensions (default) using the scikit-learn implementation of t-SNE [@tsne].
 
