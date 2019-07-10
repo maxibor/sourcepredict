@@ -21,8 +21,7 @@ bibliography: paper.bib
 SourcePredict [(github.com/maxibor/sourcepredict)](https://github.com/maxibor/sourcepredict) is a Python package distributed through Conda, to classify and predict the origin of metagenomic samples, given a reference dataset of known origins, a problem also known as source tracking.
 
 DNA shotgun sequencing of human, animal, and environmental samples has opened up new doors to explore the diversity of life in these different environments, a field known as metagenomics [@metagenomics].  
-One aspect of metagenomics is investigating the community composition of organisms within a sequencing sample with tools known as taxonomic classifiers.
-These taxonomic classifiers, such as Kraken [@kraken], compute the organism taxonomic composition from the DNA sequencing data.
+One aspect of metagenomics is investigating the community composition of organisms within a sequencing sample with tools known as taxonomic classifiers, such as Kraken @kraken.
 
 In cases where the origin of a metagenomic sample, its source, is unknown, it is often part of the research question to predict and/or confirm the source.
 Using samples of known sources, a reference dataset can be established with the taxonomic composition of the samples, *i.e.* the organisms identified in the samples as features, and the sources of the samples as class labels.
