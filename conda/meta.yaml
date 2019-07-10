@@ -1,9 +1,10 @@
 package:
   name: sourcepredict
-  version: "0.33"
+  version: "0.34"
 
 source:
-  path: ../
+  git_rev: "0.34"
+  git_url: https://github.com/maxibor/sourcepredict.git
 
 requirements:
   run:
