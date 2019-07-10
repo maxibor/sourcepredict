@@ -109,3 +109,5 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+dog_test_sample.sourcepredict.csv
+paper/review_answer/review_1_answer.md
