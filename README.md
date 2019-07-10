@@ -3,7 +3,8 @@
 
 <img src="img/sourcepredict_logo.png" width="300">
 
-SourcePredict is a Python package distributed through Conda, to classify and predict the origin of metagenomic samples, given a reference dataset of known origins, a problem also known as source tracking.
+Sourcepredict is a Python package distributed through Conda, to classify and predict the origin of metagenomic samples, given a reference dataset of known origins, a problem also known as source tracking.
+Sourcepredict solves this problem by using machine learning classification on dimensionally reduced datasets.
 
 ## Installation
 
@@ -23,7 +24,7 @@ $ conda install -c conda-forge -c etetoolkit -c bioconda -c maxibor sourcepredic
 
 ```bash
 $ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv -O dog_test_sample.csv
-$ sourcepredict -t 6 dog_test_sample.csv
+$ sourcepredict dog_test_sample.csv
 Step 1: Checking for unknown proportion
   == Sample: ERR1915662 ==
 	Adding unknown
@@ -31,42 +32,29 @@ Step 1: Checking for unknown proportion
 	Computing Bray-Curtis distance
 	Performing MDS embedding in 2 dimensions
 	KNN machine learning
-	Training KNN classifier on 6 cores...
+	Training KNN classifier on 2 cores...
 	-> Testing Accuracy: 1.0
 	----------------------
 	- Sample: ERR1915662
-		 known:98.61%
-		 unknown:1.39%
-  == Sample: ERR1915662_copy ==
-	Adding unknown
-	Normalizing (GMPR)
-	Computing Bray-Curtis distance
-	Performing MDS embedding in 2 dimensions
-	KNN machine learning
-	Training KNN classifier on 6 cores...
-	-> Testing Accuracy: 1.0
-	----------------------
-	- Sample: ERR1915662_copy
 		 known:98.61%
 		 unknown:1.39%
 Step 2: Checking for source proportion
 	Computing weighted_unifrac distance on species rank
 	TSNE embedding in 2 dimensions
 	KNN machine learning
-	Performing 5 fold cross validation on 6 cores...
+	Performing 5 fold cross validation on 2 cores...
 	Trained KNN classifier with 10 neighbors
 	-> Testing Accuracy: 0.99
 	----------------------
 	- Sample: ERR1915662
-		 Canis_familiaris:96.14%
-		 Homo_sapiens:2.44%
-		 Soil:1.42%
-	- Sample: ERR1915662_copy
-		 Canis_familiaris:96.14%
-		 Homo_sapiens:2.44%
-		 Soil:1.42%
+		 Canis_familiaris:96.1%
+		 Homo_sapiens:2.47%
+		 Soil:1.43%
 Sourcepredict result written to dog_test_sample.sourcepredict.csv
 ```
+
+Depending on the normalization method (`-n`), the embedding (`-me`) method, the cpus available for parallel processing (`-t`), and the data, the runtime should be between a few seconds and a few minutes per sink sample.
+
 
 ## Documentation
 
