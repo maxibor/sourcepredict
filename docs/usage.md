@@ -53,6 +53,22 @@ $ sourcepredict -t 6 dog_test_sample.csv
 
 ## Command line arguments
 
+### otu_table
+
+Sink otu_table in `csv` file format
+
+*Example sink otu file*
+
+```
++-------+----------+----------+
+| TAXID |  SINK_1  |  SINK_2  |
++-------+----------+----------+
+|  283  |    5     |    2     |
++-------+----------+----------+
+|  143  |     25   |    48    |
++-------+----------+----------+
+```
+
 ### -alpha
 
 Proportion of alpha of sink sample in unknown. Default = `0.1`
@@ -70,7 +86,7 @@ Path to source `csv` (training) file with samples in columns, and OTUs in rows. 
 
 `-s data/sourcepredict/modern_gut_microbiomes_sources.csv`
 
-*Example source file format:*
+*Example source file :*
 
 ```
 +-------+----------+----------+
@@ -91,7 +107,7 @@ Default = `data/modern_gut_microbiomes_labels.csv`
 
 `-l data/modern_gut_microbiomes_labels.csv`
 
-*Example source file format:*
+*Example source file :*
 
 ```
 +----------+--------+
