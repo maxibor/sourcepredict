@@ -1,5 +1,16 @@
 # Usage
 
+
+
+## Running sourcepredict on the test dataset
+
+```
+$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv -O dog_test_sample.csv
+$ sourcepredict dog_test_sample.csv
+```
+
+## Command line interface
+
 ```bash
 $ sourcepredict -h
 usage: SourcePredict v0.33 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
@@ -41,14 +52,6 @@ optional arguments:
   -k KFOLD          Number of fold for K-fold cross validation in parameter
                     optimization. Default = 5
   -t THREADS        Number of threads for parallel processing. Default = 2
-
-```
-
-## Running sourcepredict on the test dataset
-
-```bash
-$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv -O dog_test_sample.csv
-$ sourcepredict -t 6 dog_test_sample.csv
 ```
 
 ## Command line arguments
@@ -119,7 +122,7 @@ Default = `data/modern_gut_microbiomes_labels.csv`
 +----------+--------+
 ```
 
-### -n NORMALIZATION  
+### -n NORMALIZATION
 
 Normalization method. One of `RLE`, `CLR`, `Subsample`, or `GMPR`. Default = `GMPR`
 
@@ -186,3 +189,27 @@ Number of threads for parallel processing. Default = `2`
 _Example:_
 
 `-t 2`
+
+
+
+## Choice of the taxonomic classifier
+
+Different taxonomic classifiers will give different results, because of different algorithms, and different databases.
+
+In order to produce correct results with Sourcepredict, **the taxonomic classifier used to produce the *source* OTU count table must the same as the one used to produced the *sink* OTU count table**.
+
+Because Sourcepredict relies on machine learning, at least 10 samples per sources are required, but more source samples will lead to a better prediction by Sourcepredict.
+
+Therefore, running all these samples through a taxonomic classifier ahead of Sourcepredict requires a non-negligeable computational time.
+
+Hence the choice of the taxonomic classifier is a balance between precision, and computational time. 
+
+While this documentation doesn't intent to be a benchmark of taxonomic classifiers, the author of Sourcepredict has had decent results with [Kraken2](https://ccb.jhu.edu/software/kraken2/) and recommends it for its good compromise between precision and runtime.
+
+The example *source* and *sink* data provided with Sourcepredict were generated with Kraken2.
+
+
+
+
+
+
