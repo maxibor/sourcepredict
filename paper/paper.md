@@ -27,7 +27,7 @@ In cases where the origin of a metagenomic sample, its source, is unknown, it is
 Using samples of known sources, a reference dataset can be established with the taxonomic composition of the samples, *i.e.* the organisms identified in the samples as features, and the sources of the samples as class labels.
 With this reference dataset, a machine learning algorithm can be trained to predict the source of unknown samples (sinks) from their taxonomic composition.  
 Other tools used to perform the prediction of a sample source already exist, such as SourceTracker [@sourcetracker], which employs Gibbs sampling. 
-However, with Sourcepredict using a dimension reduction algorithm, followed by K-Nearest-Neighbors (KNN) classification, the interpretation of the results is made more straightforward thanks to the embedding of the samples in a human observable low dimensional space.
+However, the Sourcepredict results are easier interpreted since the samples are embedded in a human observable low-dimensional space. This embedding is performed by a dimension reduction algorithm followed by K-Nearest-Neighbours (KNN) classification.
 
 ## Method
 
