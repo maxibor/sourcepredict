@@ -23,8 +23,10 @@ $ conda install -c conda-forge -c etetoolkit -c bioconda -c maxibor sourcepredic
 ### Usage 
 
 ```bash
-$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv -O dog_test_sample.csv
-$ sourcepredict dog_test_sample.csv
+$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv -O dog_example.csv
+$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/modern_gut_microbiomes_labels.csv -O sp_labels.csv
+$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/modern_gut_microbiomes_sources.csv -O sp_sources.csv
+$ sourcepredict -s sp_sources.csv -l sp_labels.csv dog_example.csv
 Step 1: Checking for unknown proportion
   == Sample: ERR1915662 ==
 	Adding unknown
@@ -66,19 +68,16 @@ Depending on the normalization method (`-n`), the embedding (`-me`) method, the 
 
 The documentation of SourcePredict is available here: [sourcepredict.readthedocs.io](https://sourcepredict.readthedocs.io/en/latest/)
 
-## Sourcepredict source file
+## Sourcepredict example files
 
-- The sources were obtained with the [Kraken based pipeline](utils/kraken_pipeline/kraken_pipe.nf) included in this repository, using the [*MiniKraken2_v2_8GB*](https://ccb.jhu.edu/software/kraken2/dl/minikraken2_v2_8GB.tgz).  
-- The default source file is here [data/modern_gut_microbiomes_sources.csv](data/modern_gut_microbiomes_sources.csv)
-- The label file for this source file is here [data/modern_gut_microbiomes_sources.csv](data/modern_gut_microbiomes_labels.csv)
+- The sources were obtained with a simple [Nextflow pipeline](https://github.com/maxibor/kraken-nf), with Kraken2 using the [*MiniKraken2_v2_8GB*](https://ccb.jhu.edu/software/kraken2/dl/minikraken2_v2_8GB.tgz).  
+See the [documentation](https://sourcepredict.readthedocs.io/en/latest/custom_sources.html) for more informations on how to build a custom source file. 
+- The example source file is here [data/modern_gut_microbiomes_sources.csv](data/modern_gut_microbiomes_sources.csv)
+- The example label file is here [data/modern_gut_microbiomes_sources.csv](data/modern_gut_microbiomes_labels.csv)
 
 
-### Environments included in the default source file
+### Environments included in the example source file
 
 - *Homo sapiens* gut microbiome ([1](https://doi.org/10.1038/nature11234), [2](https://doi.org/10.1093/gigascience/giz004), [3](https://doi.org/10.1038/s41564-019-0409-6), [4](https://doi.org/10.1016/j.cell.2019.01.001), [5](https://doi.org/10.1038/ncomms7505), [6](http://doi.org/10.1016/j.cub.2015.04.055))
 - *Canis familiaris* gut microbiome ([1](https://doi.org/10.1186/s40168-018-0450-3))
 - Soil microbiome ([1](https://doi.org/10.1073/pnas.1215210110), [2](https://www.ncbi.nlm.nih.gov/bioproject/?term=322597), [3](https://dx.doi.org/10.1128%2FAEM.01646-17))
-
-### Updating the source file 
-
-To update the sourcefile with new kraken results, see the instruction in the [dedicated Jupyter notebook](notebooks/merge_new_data.ipynb) 

@@ -5,8 +5,10 @@
 ## Running sourcepredict on the test dataset
 
 ```
-$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv -O dog_test_sample.csv
-$ sourcepredict dog_test_sample.csv
+$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv -O dog_example.csv
+$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/modern_gut_microbiomes_labels.csv -O sp_labels.csv
+$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/modern_gut_microbiomes_sources.csv -O sp_sources.csv
+$ sourcepredict -s sp_sources.csv -l sp_labels.csv dog_example.csv
 ```
 
 ## Command line interface
