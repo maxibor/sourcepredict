@@ -4,6 +4,8 @@ joss-logo.png
 .vscode
 .sourcepredict.csv
 *.bz2
+.DS_Store
+.~lock*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
