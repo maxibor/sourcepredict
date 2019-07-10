@@ -81,3 +81,7 @@ See the [documentation](https://sourcepredict.readthedocs.io/en/latest/custom_so
 - *Homo sapiens* gut microbiome ([1](https://doi.org/10.1038/nature11234), [2](https://doi.org/10.1093/gigascience/giz004), [3](https://doi.org/10.1038/s41564-019-0409-6), [4](https://doi.org/10.1016/j.cell.2019.01.001), [5](https://doi.org/10.1038/ncomms7505), [6](http://doi.org/10.1016/j.cub.2015.04.055))
 - *Canis familiaris* gut microbiome ([1](https://doi.org/10.1186/s40168-018-0450-3))
 - Soil microbiome ([1](https://doi.org/10.1073/pnas.1215210110), [2](https://www.ncbi.nlm.nih.gov/bioproject/?term=322597), [3](https://dx.doi.org/10.1128%2FAEM.01646-17))
+
+## Contributing Code, Documentation, or Feedback
+
+If you wish to contribute to Sourcepredict, you are welcome and encouraged to contribute by opening an issue, or creating a pull-request. All contributions will be made under the GPLv3 license. More informations can found on the [contributing page](contributing.md).
