@@ -5,22 +5,25 @@
 File: `*.sourcepredict.csv`
 
 This `csv` file  contains the predicted proportion of each source in each sample.
+Like in any classification problem, the predicted source is the greatest proportion. 
 
 _Example:_
 
 ```
-+------------------+----------------------+----------------------+
-|                  |      ERR1915662      |    ERR1915662_copy   |
-+------------------+----------------------+----------------------+
-| Canis_familiaris |  0.9449678590674971  |  0.9449678590682639  |
-+------------------+----------------------+----------------------+
-|   Homo_sapiens   | 0.027033026106258438 | 0.027033026106280368 |
-+------------------+----------------------+----------------------+
-|       Soil       | 0.014110223165444446 | 0.014110223165455894 |
-+------------------+----------------------+----------------------+
-|      unknown     | 0.013888891660799834 |  0.01388889165999985 |
-+------------------+----------------------+----------------------+
++------------------+----------------------+
+|                  |      ERR1915662      |
++------------------+----------------------+
+| Canis_familiaris |  0.9449678590674971  |
++------------------+----------------------+
+|   Homo_sapiens   | 0.027033026106258438 | 
++------------------+----------------------+
+|       Soil       | 0.014110223165444446 | 
++------------------+----------------------+
+|      unknown     | 0.013888891660799834 |
++------------------+----------------------+
 ```
+
+While in this example it is pretty clear that the `ERR1915662` sample is likely a dog, you may face situations where it will be less obvious. Looking at the embedding can therefore be useful to decide from which source(s) the sink sample is made up of.
 
 ### Embedding csv file
 
@@ -64,6 +67,6 @@ _Example:_
 +-----------------+------------+-------------+--------------+-----------------+
 | ERR1915662      | -14.770308 | -30.94284   | sink         | ERR1915662      |
 +-----------------+------------+-------------+--------------+-----------------+
-| ERR1915662_copy | -14.770319 | -30.942894  | sink         | ERR1915662_copy |
-+-----------------+------------+-------------+--------------+-----------------+
 ```
+
+See the [example usage](https://sourcepredict.readthedocs.io/en/latest/run_example.html) of Sourcepredict for a example of how to plot it.
