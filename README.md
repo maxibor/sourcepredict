@@ -3,7 +3,7 @@
 
 <img src="img/sourcepredict_logo.png" width="300">
 
-Prediction/classification of the origin of a metagenomics sample.
+SourcePredict is a Python package distributed through Conda, to classify and predict the origin of metagenomic samples, given a reference dataset of known origins, a problem also known as source tracking.
 
 ## Installation
 
@@ -12,6 +12,14 @@ $ conda install -c conda-forge -c etetoolkit -c bioconda -c maxibor sourcepredic
 ```
 
 ## Example
+
+### Input
+
+- Sink file OTU count file (see [example file](https://github.com/maxibor/sourcepredict/blob/master/data/test/dog_test_sample.csv) and [documentation](https://sourcepredict.readthedocs.io/en/latest/usage.html#otu_table))
+- Source file OTU count file (see [example file](https://github.com/maxibor/sourcepredict/blob/master/data/modern_gut_microbiomes_sources.csv) and [documentation](https://sourcepredict.readthedocs.io/en/latest/usage.html#s-sources))
+- Source label file (see [example file](https://github.com/maxibor/sourcepredict/blob/master/data/modern_gut_microbiomes_labels.csv) and [documentation](https://sourcepredict.readthedocs.io/en/latest/usage.html#l-labels))
+
+### Usage 
 
 ```bash
 $ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv -O dog_test_sample.csv
