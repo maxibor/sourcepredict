@@ -31,7 +31,7 @@ However, the Sourcepredict results are easier interpreted since the samples are 
 
 ## Method
 
-Starting with a numerical organism count matrix (samples as columns, organisms as rows, obtained by a taxonomic classifier) of merged references and sinks datasets, samples are first normalized relative to each other, to correct for uneven sequencing depth using the GMPR method (default) [@gmpr].
+Starting with a numerical organism count matrix (samples as columns, organisms as rows, obtained by a taxonomic classifier) of merged references and sinks datasets, samples are first normalized relative to each other, to correct for uneven sequencing depth using the geometric mean of pairwise ratios (GMPR) method (default) [@gmpr].
 After normalization, Sourcepredict performs a two-step prediction algorithm. First, it predicts the proportion of unknown sources, *i.e.* which are not represented in the reference dataset. Second it predicts the proportion of each known source of the reference dataset in the sink samples.
 
 Organisms are represented by their taxonomic identifiers (TAXID).
@@ -39,8 +39,8 @@ Organisms are represented by their taxonomic identifiers (TAXID).
 ### Prediction of unknown sources proportion
 
 Let $S_i \in \{S_1, .., S_n\}$ be a sample from the normalized sinks dataset $D_{sink}$,  $o_{j}^{\ i} \in \{o_{1}^{\ i},.., o_{n_o^{\ i}}^{\ i}\}$ be an organism in $S_i$, and $n_o^{\ i}$ be the total number of organisms in $S_i$, with $o_{j}^{\ i} \in \mathbb{Z}+$.  
-Let $m$ be the mean number of samples per class in the reference dataset, such that $m = \frac{1}{O}\sum_{i=1}^{O}S_i$.  
-For each  $S_i$ sample, I define $||m||$ estimated samples $U_k^{S_i} \in \{U_1^{S_i}, ..,U_{||m||}^{S_i}\}$ to add to the reference dataset to account for the unknown source proportion in a test sample.
+Let $m$ be the mean number of samples per source in the reference dataset, such that $m = \frac{1}{O}\sum_{i=1}^{O}S_i$.  
+For each  $S_i$ sample, I define $||m||$ derivative samples $U_k^{S_i} \in \{U_1^{S_i}, ..,U_{||m||}^{S_i}\}$ to add to the reference dataset to account for the unknown source proportion in a test sample.
 
 Separately for each $S_i$, a proportion denoted $\alpha \in [0,1]$ (default = $0.1$) of each of the $o_{j}^{\ i}$ organism of $S_i$ is added to each $U_k^{S_i}$ samples such that $U_k^{S_i}(o_j^{\ i}) = \alpha \cdot x_{i \ j}$ , where $x_{i \ j}$ is sampled from a Gaussian distribution $\mathcal{N}\big(S_i(o_j^{\ i}), 0.01)$.
 
