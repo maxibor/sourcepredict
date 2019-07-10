@@ -14,7 +14,7 @@ $ conda install -c conda-forge -c etetoolkit -c bioconda -c maxibor sourcepredic
 ## Example
 
 ```bash
-$ wget wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv -O dog_test_sample.csv
+$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv -O dog_test_sample.csv
 $ sourcepredict -t 6 dog_test_sample.csv
 Step 1: Checking for unknown proportion
   == Sample: ERR1915662 ==
@@ -73,9 +73,9 @@ The documentation of SourcePredict is available here: [sourcepredict.readthedocs
 
 ### Environments included in the default source file
 
-- *Homo sapiens* gut microbiome
-- *Canis familiaris* gut microbiome
-- Soil microbiome
+- *Homo sapiens* gut microbiome ([1](https://doi.org/10.1038/nature11234), [2](https://doi.org/10.1093/gigascience/giz004), [3](https://doi.org/10.1038/s41564-019-0409-6), [4](https://doi.org/10.1016/j.cell.2019.01.001), [5](https://doi.org/10.1038/ncomms7505), [6](http://doi.org/10.1016/j.cub.2015.04.055))
+- *Canis familiaris* gut microbiome ([1](https://doi.org/10.1186/s40168-018-0450-3))
+- Soil microbiome ([1](https://doi.org/10.1073/pnas.1215210110), [2](https://www.ncbi.nlm.nih.gov/bioproject/?term=322597), [3](https://dx.doi.org/10.1128%2FAEM.01646-17))
 
 ### Updating the source file 
 
