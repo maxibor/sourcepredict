@@ -13,11 +13,12 @@ affiliations:
    index: 1
 date: 15th May 2019
 bibliography: paper.bib
+
 ---
 
 # Summary
 
-SourcePredict [(github.com/maxibor/sourcepredict)](https://github.com/maxibor/sourcepredict) is a Python Conda package to classify and predict the origin of metagenomic samples, given a reference dataset of known origins, a problem also known as source tracking.
+SourcePredict [(github.com/maxibor/sourcepredict)](https://github.com/maxibor/sourcepredict) is a Python package distributed through Conda, to classify and predict the origin of metagenomic samples, given a reference dataset of known origins, a problem also known as source tracking.
 
 DNA shotgun sequencing of human, animal, and environmental samples has opened up new doors to explore the diversity of life in these different environments, a field known as metagenomics [@metagenomics].  
 One aspect of metagenomics is investigating the community composition of organisms within a sequencing sample with tools known as taxonomic classifiers.
@@ -29,8 +30,8 @@ With this reference dataset, a machine learning algorithm can be trained to pred
 Other tools used to perform the prediction of a sample source already exist, such as SourceTracker [@sourcetracker], which employs Gibbs sampling. 
 However, with Sourcepredict using a dimension reduction algorithm, followed by K-Nearest-Neighbors (KNN) classification, the interpretation of the results is made more straightforward thanks to the embedding of the samples in a human observable low dimensional space.
 
-
 ## Method
+
 Starting with a numerical organism count matrix (samples as columns, organisms as rows, obtained by a taxonomic classifier) of merged references and sinks datasets, samples are first normalized relative to each other, to correct for uneven sequencing depth using the GMPR method (default) [@gmpr].
 After normalization, Sourcepredict performs a two-step prediction algorithm. First, it predicts the proportion of unknown sources, *i.e.* which are not represented in the reference dataset. Second it predicts the proportion of each known source of the reference dataset in the sink samples.
 
