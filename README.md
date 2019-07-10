@@ -53,6 +53,12 @@ Step 2: Checking for source proportion
 Sourcepredict result written to dog_test_sample.sourcepredict.csv
 ```
 
+### Output
+
+Sourcepredict output the predicted source contribution to each sink sample, and the embedding of all samples in the lower dimensional space.  See [documentation](https://sourcepredict.readthedocs.io/en/latest/results.html) for details.
+
+### Runtime
+
 Depending on the normalization method (`-n`), the embedding (`-me`) method, the cpus available for parallel processing (`-t`), and the data, the runtime should be between a few seconds and a few minutes per sink sample.
 
 
