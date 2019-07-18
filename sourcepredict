@@ -138,7 +138,7 @@ if __name__ == "__main__":
             print(f"\tNormalizing ({normalization})")
             su.normalize(method=normalization, threads=THREADS)
             print("\tComputing Bray-Curtis distance")
-            su.compute_distance(rank=tax_rank)
+            su.compute_distance()
             print(
                 f"\tPerforming MDS embedding in {DIM} dimension{utils.plural(DIM)}")
             su.embed(n_comp=DIM, seed=SEED, out_csv=EMBED_CSV)
