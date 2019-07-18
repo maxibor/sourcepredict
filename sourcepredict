@@ -47,7 +47,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         '-n',
         dest="normalization",
         default='GMPR',
-        help="Normalization method (RLE | Subsample | GMPR). Default = GMPR")
+        help="Normalization method (RLE | Subsample | GMPR | None). Default = GMPR")
     parser.add_argument(
         '-dt',
         dest="distance",
@@ -125,24 +125,27 @@ if __name__ == "__main__":
     tax_rank = "species"
     samp_pred = {}
     print("Step 1: Checking for unknown proportion")
+    if ALPHA == 0:
+        print(f"\tSkipping Step 1 for alpha = {ALPHA}")
     for s in sinks:
-        sample = ''.join(list(s.columns))
-        samp_pred[sample] = {}
-        print(f"  == Sample: {sample} ==")
-        su = sourceunknown(source=SOURCES, sink=s, labels=LABELS)
-        print("\tAdding unknown")
-        su.add_unknown(alpha=ALPHA, seed=SEED)
-        print(f"\tNormalizing ({normalization})")
-        su.normalize(method=normalization, threads=THREADS)
-        print("\tComputing Bray-Curtis distance")
-        su.compute_distance(rank=tax_rank)
-        print(
-            f"\tPerforming MDS embedding in {DIM} dimension{utils.plural(DIM)}")
-        su.embed(n_comp=DIM, seed=SEED, out_csv=EMBED_CSV)
+        if ALPHA > 0:
+            sample = ''.join(list(s.columns))
+            samp_pred[sample] = {}
+            print(f"  == Sample: {sample} ==")
+            su = sourceunknown(source=SOURCES, sink=s, labels=LABELS)
+            print("\tAdding unknown")
+            su.add_unknown(alpha=ALPHA, seed=SEED)
+            print(f"\tNormalizing ({normalization})")
+            su.normalize(method=normalization, threads=THREADS)
+            print("\tComputing Bray-Curtis distance")
+            su.compute_distance(rank=tax_rank)
+            print(
+                f"\tPerforming MDS embedding in {DIM} dimension{utils.plural(DIM)}")
+            su.embed(n_comp=DIM, seed=SEED, out_csv=EMBED_CSV)
 
-        print("\tKNN machine learning")
-        pred = su.ml(seed=SEED, threads=THREADS)
-        samp_pred[sample]['unknown'] = pred[sample]['unknown']
+            print("\tKNN machine learning")
+            pred = su.ml(seed=SEED, threads=THREADS)
+            samp_pred[sample]['unknown'] = pred[sample]['unknown']
 
     print("Step 2: Checking for source proportion")
     sm = sourcemap(source=SOURCES, sink=SINK, labels=LABELS,
@@ -154,8 +157,10 @@ if __name__ == "__main__":
     print("\tKNN machine learning")
     umap_pred = sm.knn_classification(
         kfold=KFOLD, threads=THREADS, seed=SEED)
-
-    prediction = utils.account_unk(samp_pred=samp_pred, umap_pred=umap_pred)
+    if ALPHA > 0:
+        prediction = utils.account_unk(samp_pred=samp_pred, umap_pred=umap_pred)
+    else:
+        prediction = pd.DataFrame(umap_pred)
     if OUTPUT is None:
         OUTPUT = f"{utils._get_basename(SINK)}.sourcepredict.csv"
     prediction.to_csv(OUTPUT)

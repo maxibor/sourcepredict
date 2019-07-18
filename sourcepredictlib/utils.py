@@ -92,8 +92,9 @@ def check_norm(method):
         >>> check_norm('rle')
         'RLE'
     """
-
     methods = ['RLE', 'SUBSAMPLE', 'GMPR']
+    if method == 'None':
+        return("no normalization")
     method = method.upper()
     if method not in methods:
         print("Please check the normalization method (GMPR, RLE, or Subsample)")

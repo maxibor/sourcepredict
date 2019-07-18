@@ -13,6 +13,7 @@ import utils
 
 def test_checks():
     assert utils.check_norm('rle') == 'RLE'
+    assert utils.check_norm('None') == "no normalization"
     assert utils.check_embed('tsne') == 'TSNE'
     assert utils.check_distance('Weighted_unifrac') == 'weighted_unifrac'
     assert utils.check_gen_seed(42) == 42
