@@ -73,16 +73,15 @@ def test_sourceunknown_normalized(su):
 def test_compute_distance(su):
     su.add_unknown(alpha=0.1, seed=42)
     su.normalize(method='GMPR', threads=2)
-    su.compute_distance(rank='species')
+    su.compute_distance()
 
     assert su.bc.shape == (181, 181)
-    assert su.normalized_rank.shape == (181, 2)
 
 
 def test_embed(su):
     su.add_unknown(alpha=0.1, seed=42)
     su.normalize(method='GMPR', threads=2)
-    su.compute_distance(rank='species')
+    su.compute_distance()
     su.embed(n_comp=2, seed=42, out_csv=None)
 
     assert su.my_embed.shape == (181, 2)
@@ -97,7 +96,7 @@ def test_embed(su):
 def test_unk_ml(su):
     su.add_unknown(alpha=0.1, seed=42)
     su.normalize(method='GMPR', threads=2)
-    su.compute_distance(rank='species')
+    su.compute_distance()
     su.embed(n_comp=2, seed=42, out_csv=None)
     res = su.ml(seed=42, threads=2)
     assert round(res['metagenomebis']['known'], 3) == 0.952

@@ -47,7 +47,7 @@ class sourceunknown():
                 class in 2nd column
 
         """
-        self.ref = pd.read_csv(source, index_col=0, dtype='int64')
+        self.ref = pd.read_csv(source, index_col=0)
         y = pd.read_csv(labels, index_col=0)
         self.y = y['labels']
         self.y_unk = pd.Series(data=['known']*len(list(self.y)), index=y.index)
@@ -114,6 +114,8 @@ class sourceunknown():
                 warnings.simplefilter("ignore", RuntimeWarning)
                 self.normalized = normalize.GMPR_normalize(
                     self.combined, threads)
+        elif method == "no normalization":
+            self.normalized = self.combined
 
         self.normalized_ref_u = pd.merge(left=self.normalized, right=self.ref_u,
                                          how='outer', left_index=True, right_index=True).fillna(0)
@@ -127,25 +129,11 @@ class sourceunknown():
             sys.exit(1)
         self.y_unk = self.y_unk.append(self.ref_u_labs)
 
-    def compute_distance(self, rank='species'):
+    def compute_distance(self):
         """Sample pairwise distance computation
-
-        Args:
-            rank(str): Taxonomics rank to keep for filtering OTUs
         """
-
-        # Getting a single Taxonomic rank
-        ncbi = NCBITaxa()
-        only_rank = []
-        for i in list(self.normalized_ref_u.index):
-            try:
-                if ncbi.get_rank([i])[i] == rank:
-                    only_rank.append(i)
-            except KeyError:
-                continue
-        self.normalized_rank = self.normalized_ref_u.loc[only_rank, :].T
-        self.skbio_bc = beta_diversity("braycurtis", counts=self.normalized_rank.as_matrix().astype(int), ids=list(
-            self.normalized_rank.index))
+        self.skbio_bc = beta_diversity("braycurtis", counts=self.normalized_ref_u.T.values.astype(float), ids=list(
+            self.normalized_ref_u.T.index))
         self.bc = self.skbio_bc.to_data_frame()
 
     def embed(self, seed, n_comp=200, out_csv=None):
@@ -248,6 +236,8 @@ class sourcemap():
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", RuntimeWarning)
                 self.normalized = normalize.GMPR_normalize(combined, threads).T
+        elif norm_method == "no normalization":
+            self.normalized = combined.T
         self.train_samples = list(self.train.columns)
         self.test_samples = list(self.test.columns)
         labels = pd.read_csv(labels, index_col=0)
