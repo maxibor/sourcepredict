@@ -1,6 +1,6 @@
 # Custom sources
 
-> Different taxonomic classifers will give different results, and **the taxonomic classifier used to produce the *source* OTU count table must the same as the one used to produced the *sink* OTU count table**.
+> Different taxonomic classifers will give different results, and **the taxonomic classifier used to produce the *source* OTU count table must the same as the one used to produce the *sink* OTU count table**.
 
 While there are many available taxonomic classifiers available to produce the source and sink OTU table, the Sourcepredict author provide a simple pipeline to generate the source and sink OTU table.
 
