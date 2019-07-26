@@ -150,7 +150,8 @@ def test_sourcemap_embed_MDS(sm):
 def test_sourcemap_ml(sm):
     sm.compute_distance(distance_method='weighted_unifrac', rank='species')
     sm.embed(n_comp=2, method='MDS', seed=42, out_csv=None)
-    res = sm.knn_classification(kfold=3, threads=1, seed=42)
+    res = sm.knn_classification(
+        kfold=3, threads=1, seed=42, neighbors=10, weigth='distance')
 
     assert round(res['metagenomebis']['Bacillus_subtilis'], 3) == 0.875
     assert round(res['metagenomebis']['Escherichia_coli'], 3) == 0.125

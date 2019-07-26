@@ -321,7 +321,7 @@ class sourcemap():
             self.labels.to_frame(), left_index=True, right_index=True)
         self.sink_t = self.my_embed.drop(self.train_samples, axis=0)
 
-    def knn_classification(self, kfold, threads, seed):
+    def knn_classification(self, kfold, threads, seed, neighbors, weigth):
         """Performs KNN classification
 
         KNN machine learning to predict unknown proportion
@@ -343,22 +343,30 @@ class sourcemap():
 
         knn_c = KNeighborsClassifier(n_jobs=threads)
 
-        param_knn_grid = {
-            'n_neighbors': [10, 20, 50]
-        }
+        if neighbors == 0:
 
-        CV_knn = GridSearchCV(
-            estimator=knn_c, param_grid=param_knn_grid, cv=kfold, n_jobs=threads)
+            param_knn_grid = {
+                'n_neighbors': [10, 20, 50]
+            }
 
-        print(
-            f"\tPerforming {kfold} fold cross validation on {threads} cores...")
-        CV_knn.fit(train_t_features, train_t_labels)
+            CV_knn = GridSearchCV(
+                estimator=knn_c, param_grid=param_knn_grid, cv=kfold, n_jobs=threads)
 
-        knn2_c = KNeighborsClassifier(
-            n_neighbors=CV_knn.best_params_['n_neighbors'], weights='distance', n_jobs=threads)
+            print(
+                f"\tPerforming {kfold} fold cross validation on {threads} cores...")
+            CV_knn.fit(train_t_features, train_t_labels)
 
-        print(
-            f"\tTrained KNN classifier with {CV_knn.best_params_['n_neighbors']} neighbors")
+            knn2_c = KNeighborsClassifier(
+                n_neighbors=CV_knn.best_params_['n_neighbors'], weights=weigth, n_jobs=threads)
+
+            print(
+                f"\tTrained KNN classifier with {CV_knn.best_params_['n_neighbors']} neighbors")
+        else:
+            knn2_c = KNeighborsClassifier(
+                n_neighbors=neighbors, weights=weigth, n_jobs=threads)
+            print(
+                f"\tTrained KNN classifier with {neighbors} neighbors")
+
         knn2_c.fit(train_t_features, train_t_labels)
         y_pred = knn2_c.predict(test_t_features)
         print("\t-> Testing Accuracy:", round(metrics.accuracy_score(

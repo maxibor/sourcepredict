@@ -145,6 +145,26 @@ def check_distance(method):
         return(method)
 
 
+def check_weigths(weight):
+    """Check if weight parameter for KNN is valid
+
+    Args:
+        method(str): weight parameter
+    Returns:
+        str: lowercase weigth parameter
+    Example:
+        >>> check_weigths('Uniform')
+        'uniform'
+    """
+    weights = ['uniform', 'distance']
+    weight = weight.lower()
+    if weight not in weights:
+        print(f"Please check the weight parameter ({' or '.join(weights)})")
+        sys.exit(1)
+    else:
+        return(weight)
+
+
 def check_gen_seed(seed, amin=1, amax=10000):
     """Check random seed
 

@@ -19,7 +19,7 @@ usage: SourcePredict v0.33 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
                            [-n NORMALIZATION] [-dt DISTANCE] [-me METHOD]
                            [-e EMBED] [-di DIM] [-o OUTPUT] [-se SEED]
                            [-k KFOLD] [-t THREADS]
-                           otu_table
+                           abundance_table
 
 ==========================================================
 SourcePredict v0.33
@@ -31,7 +31,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
 
 
 positional arguments:
-  otu_table         path to otu table in csv format
+  abundance_table   path to TAXID abundance count table in csv format
 
 optional arguments:
   -h, --help        show this help message and exit
@@ -58,11 +58,11 @@ optional arguments:
 
 ## Command line arguments
 
-### otu_table
+### abundance_table
 
-Sink otu_table in `csv` file format
+Sink abundance_table in `csv` file format
 
-*Example sink otu file*
+*Example sink count table file*
 
 ```
 +-------+----------+----------+
@@ -85,7 +85,7 @@ $$\alpha \in [0,1]$$
 
 ### -s SOURCES
 
-Path to source `csv` (training) file with samples in columns, and OTUs in rows. Default = `data/sourcepredict/modern_gut_microbiomes_sources.csv`
+Path to source `csv` (training) file with samples in columns, and TAXIDs in rows. Default = `data/sourcepredict/modern_gut_microbiomes_sources.csv`
 
 *Example:*
 
@@ -144,6 +144,27 @@ _Example:_
 
 `-me TSNE`
 
+### -kne NEIGHBORS
+
+Numbers of neigbors for KNN classication. Default = 0 (chosen by CV).
+
+_Example:_
+
+`-kne 30`
+
+> Setting the number of neighbors to 0 will let Sourcepredict choose the optimal number of neighbors for **classification**.  
+However, for **source proportion estimation**, setting manually a higher number of samples (for example, 50) will help for better proportion estimations.  
+See [example 2](https://sourcepredict.readthedocs.io/en/latest/mixed_prop.html) for illustration.
+
+### --kw WEIGHTS
+
+Sample weight function for KNN prediction (distance | uniform). Default = distance.
+
+Choose to give a uniform or distance based weights to neighbor samples in KNN algorithm.
+
+> Distance base weights will work better for **classification** while uniform weigths will work better for **source proportion estimation**.  
+See [example 2](https://sourcepredict.readthedocs.io/en/latest/mixed_prop.html) for illustration.
+
 ### -e EMBED
 
 File for saving embedding coordinates in `csv` format. Default = `None`
@@ -198,7 +219,7 @@ _Example:_
 
 Different taxonomic classifiers will give different results, because of different algorithms, and different databases.
 
-In order to produce correct results with Sourcepredict, **the taxonomic classifier used to produce the *source* OTU count table must the same as the one used to produced the *sink* OTU count table**.
+In order to produce correct results with Sourcepredict, **the taxonomic classifier used to produce the *source* TAXID count table must the same as the one used to produced the *sink* TAXID count table**.
 
 Because Sourcepredict relies on machine learning, at least 10 samples per sources are required, but more source samples will lead to a better prediction by Sourcepredict.
 
