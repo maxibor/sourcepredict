@@ -17,8 +17,8 @@ $ sourcepredict -s sp_sources.csv -l sp_labels.csv dog_example.csv
 $ sourcepredict -h
 usage: SourcePredict v0.33 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
                            [-n NORMALIZATION] [-dt DISTANCE] [-me METHOD]
-                           [-e EMBED] [-di DIM] [-o OUTPUT] [-se SEED]
-                           [-k KFOLD] [-t THREADS]
+                           [-kne NEIGHBORS] [-kw WEIGHTS] [-e EMBED] [-di DIM]
+                           [-o OUTPUT] [-se SEED] [-k KFOLD] [-t THREADS]
                            abundance_table
 
 ==========================================================
@@ -40,11 +40,15 @@ optional arguments:
                     data/modern_gut_microbiomes_sources.csv
   -l LABELS         Path to labels csv file. Default =
                     data/modern_gut_microbiomes_labels.csv
-  -n NORMALIZATION  Normalization method (RLE | Subsample | GMPR). Default =
-                    GMPR
+  -n NORMALIZATION  Normalization method (RLE | Subsample | GMPR | None).
+                    Default = GMPR
   -dt DISTANCE      Distance method. (unweighted_unifrac | weighted_unifrac)
                     Default = weighted_unifrac
-  -me METHOD        Embedding Method. TSNE or UMAP. Default = TSNE
+  -me METHOD        Embedding Method. TSNE, MDS, or UMAP. Default = TSNE
+  -kne NEIGHBORS    Numbers of neigbors for KNN classication. Default = 0
+                    (chosen by CV)
+  -kw WEIGHTS       Sample weight function for KNN prediction (distance |
+                    uniform). Default = distance.
   -e EMBED          Output embedding csv file. Default = None
   -di DIM           Number of dimensions to retain for dimension reduction.
                     Default = 2
