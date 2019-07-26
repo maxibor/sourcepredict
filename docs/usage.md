@@ -223,7 +223,7 @@ _Example:_
 
 Different taxonomic classifiers will give different results, because of different algorithms, and different databases.
 
-In order to produce correct results with Sourcepredict, **the taxonomic classifier used to produce the *source* TAXID count table must the same as the one used to produced the *sink* TAXID count table**.
+In order to produce correct results with Sourcepredict, **the taxonomic classifier used to produce the *source* TAXID count table must be the same as the one used to produce the *sink* TAXID count table**.
 
 Because Sourcepredict relies on machine learning, at least 10 samples per sources are required, but more source samples will lead to a better prediction by Sourcepredict.
 
