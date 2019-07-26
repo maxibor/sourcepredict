@@ -16,8 +16,8 @@ $ conda install -c conda-forge -c etetoolkit -c bioconda -c maxibor sourcepredic
 
 ### Input
 
-- Sink file OTU count file (see [example file](https://github.com/maxibor/sourcepredict/blob/master/data/test/dog_test_sample.csv) and [documentation](https://sourcepredict.readthedocs.io/en/latest/usage.html#otu_table))
-- Source file OTU count file (see [example file](https://github.com/maxibor/sourcepredict/blob/master/data/modern_gut_microbiomes_sources.csv) and [documentation](https://sourcepredict.readthedocs.io/en/latest/usage.html#s-sources))
+- Sink taxonomic count file (see [example file](https://github.com/maxibor/sourcepredict/blob/master/data/test/dog_test_sample.csv) and [documentation](https://sourcepredict.readthedocs.io/en/latest/usage.html#otu_table))
+- Source taxonomic count file (see [example file](https://github.com/maxibor/sourcepredict/blob/master/data/modern_gut_microbiomes_sources.csv) and [documentation](https://sourcepredict.readthedocs.io/en/latest/usage.html#s-sources))
 - Source label file (see [example file](https://github.com/maxibor/sourcepredict/blob/master/data/modern_gut_microbiomes_labels.csv) and [documentation](https://sourcepredict.readthedocs.io/en/latest/usage.html#l-labels))
 
 ### Usage 
