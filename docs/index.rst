@@ -23,6 +23,7 @@ __ homepage_
    custom_sources
    add_new_sources
    run_example
+   mixed_prop
 
 
 Indices and tables
