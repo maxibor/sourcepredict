@@ -16,14 +16,14 @@ $ conda install -c conda-forge -c etetoolkit -c bioconda -c maxibor sourcepredic
 
 ### Input
 
-- Sink taxonomic count file (see [example file](https://github.com/maxibor/sourcepredict/blob/master/data/test/dog_test_sample.csv) and [documentation](https://sourcepredict.readthedocs.io/en/latest/usage.html#otu_table))
+- Sink taxonomic count file (see [example file](https://github.com/maxibor/sourcepredict/blob/master/data/test/dog_test_sink_sample.csv) and [documentation](https://sourcepredict.readthedocs.io/en/latest/usage.html#sink_table))
 - Source taxonomic count file (see [example file](https://github.com/maxibor/sourcepredict/blob/master/data/modern_gut_microbiomes_sources.csv) and [documentation](https://sourcepredict.readthedocs.io/en/latest/usage.html#s-sources))
 - Source label file (see [example file](https://github.com/maxibor/sourcepredict/blob/master/data/modern_gut_microbiomes_labels.csv) and [documentation](https://sourcepredict.readthedocs.io/en/latest/usage.html#l-labels))
 
 ### Usage 
 
 ```bash
-$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv -O dog_example.csv
+$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sink_sample.csv -O dog_example.csv
 $ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/modern_gut_microbiomes_labels.csv -O sp_labels.csv
 $ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/modern_gut_microbiomes_sources.csv -O sp_sources.csv
 $ sourcepredict -s sp_sources.csv -l sp_labels.csv dog_example.csv
