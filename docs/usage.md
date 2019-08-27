@@ -223,7 +223,7 @@ _Example:_
 
 Different taxonomic classifiers will give different results, because of different algorithms, and different databases.
 
-In order to produce correct results with Sourcepredict, **the taxonomic classifier used to produce the *source* TAXID count table must be the same as the one used to produce the *sink* TAXID count table**.
+In order to produce correct results with Sourcepredict, **the taxonomic classifier and the database used to produce the *source* TAXID count table must be the same as the one used to produce the *sink* TAXID count table**.
 
 Because Sourcepredict relies on machine learning, at least 10 samples per sources are required, but more source samples will lead to a better prediction by Sourcepredict.
 
@@ -235,7 +235,7 @@ While this documentation doesn't intent to be a benchmark of taxonomic classifie
 
 The example *source* and *sink* data provided with Sourcepredict were generated with Kraken2.
 
-
+> If you already have kraken report formatted results (from Kraken, KrakenUniq, Kraken2, Centrifuge, ...), you can use the [kraken_parse.py](https://github.com/maxibor/kraken-nf/blob/master/bin/kraken_parse.py) script to convert a kraken report to a column of a TAXID count table.
 
 
 
