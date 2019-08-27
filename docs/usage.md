@@ -5,7 +5,7 @@
 ## Running sourcepredict on the test dataset
 
 ```
-$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sample.csv -O dog_example.csv
+$ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/test/dog_test_sink_sample.csv -O dog_example.csv
 $ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/modern_gut_microbiomes_labels.csv -O sp_labels.csv
 $ wget https://raw.githubusercontent.com/maxibor/sourcepredict/master/data/modern_gut_microbiomes_sources.csv -O sp_sources.csv
 $ sourcepredict -s sp_sources.csv -l sp_labels.csv dog_example.csv
@@ -19,7 +19,7 @@ usage: SourcePredict v0.33 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
                            [-n NORMALIZATION] [-dt DISTANCE] [-me METHOD]
                            [-kne NEIGHBORS] [-kw WEIGHTS] [-e EMBED] [-di DIM]
                            [-o OUTPUT] [-se SEED] [-k KFOLD] [-t THREADS]
-                           abundance_table
+                           sink_table
 
 ==========================================================
 SourcePredict v0.33
@@ -31,7 +31,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
 
 
 positional arguments:
-  abundance_table   path to TAXID abundance count table in csv format
+  sink_table   path to sink TAXID count table in csv format
 
 optional arguments:
   -h, --help        show this help message and exit
@@ -62,9 +62,9 @@ optional arguments:
 
 ## Command line arguments
 
-### abundance_table
+### sink_table
 
-Sink abundance_table in `csv` file format
+Sink TAXID count table in `csv` file format
 
 *Example sink count table file*
 

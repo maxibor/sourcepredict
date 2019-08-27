@@ -10,10 +10,10 @@ def RLE_normalize(pd_dataframe):
     """Normalize with Relative Log Expression
 
     Args:
-        pd_dataframe (pandas DataFrame): OTU count dataframe,
-            colums as Samples, Rows as OTUs
+        pd_dataframe (pandas DataFrame): TAXID count dataframe,
+            colums as Samples, Rows as TAXIDs
     Returns:
-        pandas DataFrame: RLE Normalized datafrane. Colums as Samples, Rows as OTUs
+        pandas DataFrame: RLE Normalized datafrane. Colums as Samples, Rows as TAXIDs
     Example:
         >>> RLE_normalize(pd.DataFrame)
     """
@@ -34,10 +34,10 @@ def subsample_normalize_pd(pd_dataframe):
     """Normalize with Subsampling
 
     Args:
-        pd_dataframe (pandas DataFrame): OTU count dataframe,
-            colums as Samples, Rows as OTUs
+        pd_dataframe (pandas DataFrame): TAXID count dataframe,
+            colums as Samples, Rows as TAXIDs
     Returns:
-       pandas DataFrame: Subsample Normalized dataframe. Colums as Samples, Rows as OTUs
+       pandas DataFrame: Subsample Normalized dataframe. Colums as Samples, Rows as TAXIDs
     """
 
     def subsample_normalize(serie, omax):
@@ -86,8 +86,8 @@ def gmpr_size_factor(col, ar):
 
     Args:
         col (int): columm index of the numpy array
-        ar (numpy array): numpy array of OTU counts,
-            colums as Samples, Rows as OTUs
+        ar (numpy array): numpy array of TAXID counts,
+            colums as Samples, Rows as TAXIDs
     Returns:
         float: GMPR size factor per column
     """
@@ -108,8 +108,8 @@ def GMPR_normalize(df, process):
     PeerJ, 6, e4600.
 
     Args:
-        df (pandas Dataframe): OTU count dataframe,
-            colums as Samples, Rows as OTUs
+        df (pandas Dataframe): TAXID count dataframe,
+            colums as Samples, Rows as TAXIDs
         process (int): number of process for parallelization
     """
     ar = np.asarray(df)

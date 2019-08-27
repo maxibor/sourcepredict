@@ -1,8 +1,8 @@
 # Custom sources
 
-> Different taxonomic classifers will give different results, and **the taxonomic classifier used to produce the *source* OTU count table must be the same as the one used to produce the *sink* OTU count table**.
+> Different taxonomic classifers will give different results, and **the taxonomic classifier used to produce the *source* TAXID count table must be the same as the one used to produce the *sink* TAXID count table**.
 
-While there are many available taxonomic classifiers available to produce the source and sink OTU table, the Sourcepredict author provide a simple pipeline to generate the source and sink OTU table.
+While there are many available taxonomic classifiers available to produce the source and sink TAXID table, the Sourcepredict author provide a simple pipeline to generate the source and sink TAXID table.
 
 This pipeline is written using [Nextflow](https://www.nextflow.io/), and handles the dependancies using [conda](https://conda.io/en/latest/).
 Briefly, this pipelines will firt trim and clip the sequencing files with [AdapterRemoval](https://github.com/MikkelSchubert/adapterremoval) before performing the taxonomic classification with [Kraken2](https://ccb.jhu.edu/software/kraken2).

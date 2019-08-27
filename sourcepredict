@@ -26,7 +26,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
 ==========================================================
         ''')
     parser.add_argument(
-        'abundance_table', help="path to TAXID abundance count table in csv format")
+        'sink_table', help="path to sink TAXID count table in csv format")
     parser.add_argument(
         '-a',
         dest="alpha",
@@ -107,7 +107,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
 
     args = parser.parse_args()
 
-    sink = args.abundance_table
+    sink = args.sink_table
     alpha = float(args.alpha)
     normalization = args.normalization
     sources = args.sources

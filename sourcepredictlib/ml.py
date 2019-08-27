@@ -39,9 +39,9 @@ class sourceunknown():
         Combines sink and source in one pd Dataframe
 
         Args:
-            source(str): training data csv file with OTUs at index, 
+            source(str): training data csv file with TAXIDs at index, 
                 Samples as columns
-            sink(pd Dataframe): test data csv file with OTUs at index, 
+            sink(pd Dataframe): test data csv file with TAXIDs at index, 
                 Samples as columns
             labels(str): labels csv file with Samples in first column, 
                 class in 2nd column
@@ -64,11 +64,11 @@ class sourceunknown():
 
         Create unknown Samples from test sample
         N Random samples are created with N being average of class counts
-        For each random samples OTU, count is taken from nornal distrib with a 
-        mean of test OTU count.
+        For each random samples TAXID, count is taken from nornal distrib with a 
+        mean of test TAXID count.
 
         Args:
-            alpha(float): proportion of each OTU count from test samples 
+            alpha(float): proportion of each TAXID count from test samples 
                 to include in unknown sample
             seed(int): seed for random number generator
         """
@@ -99,7 +99,7 @@ class sourceunknown():
         """Sample count normalization
 
         Performs normalization of the count data to balance coverage differences
-        and missing OTUs
+        and missing TAXIDs
 
         Args:
             method(str): normalization method
@@ -214,9 +214,9 @@ class sourcemap():
         Combines sink(test) and source(train) in one pd Dataframe
 
         Args:
-            source (str): training data csv file with OTUs at index, 
+            source (str): training data csv file with TAXIDs at index, 
                 Samples as columns
-            sink (str): test data csv file with OTUs at index, 
+            sink (str): test data csv file with TAXIDs at index, 
                 Samples as columns
             labels (str): labels csv file with Samples in first column, 
                 class in 2nd column
@@ -248,7 +248,7 @@ class sourcemap():
 
         Args:
             distance_method (str): distance method
-            rank (str, optional): Taxonomics rank to keep for filtering OTUs. Defaults to 'species'.
+            rank (str, optional): Taxonomics rank to keep for filtering TAXIDs. Defaults to 'species'.
         """
 
         # Getting a single Taxonomic rank
