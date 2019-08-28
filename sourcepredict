@@ -127,7 +127,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
 
 
 if __name__ == "__main__":
-    version = "0.33"
+    version = "0.34"
     warnings.filterwarnings("ignore")
     SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, DISTANCE, METHOD, NEIGHBORS, WEIGTHS, DIM, OUTPUT, EMBED_CSV, KFOLD, THREADS = _get_args()
     SEED = utils.check_gen_seed(SEED)

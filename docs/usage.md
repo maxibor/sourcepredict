@@ -15,7 +15,7 @@ $ sourcepredict -s sp_sources.csv -l sp_labels.csv dog_example.csv
 
 ```bash
 $ sourcepredict -h
-usage: SourcePredict v0.33 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
+usage: SourcePredict v0.34 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
                            [-n NORMALIZATION] [-dt DISTANCE] [-me METHOD]
                            [-kne NEIGHBORS] [-kw WEIGHTS] [-e EMBED] [-di DIM]
                            [-o OUTPUT] [-se SEED] [-k KFOLD] [-t THREADS]
