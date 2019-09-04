@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/maxibor/sourcepredict.svg?token=pwT9AgYi4qJY4LTp9WUy&branch=master)](https://travis-ci.com/maxibor/sourcepredict) [![Coverage Status](https://coveralls.io/repos/github/maxibor/sourcepredict/badge.svg?branch=master)](https://coveralls.io/github/maxibor/sourcepredict?branch=master) [![Anaconda-Server Badge](https://anaconda.org/maxibor/sourcepredict/badges/installer/conda.svg)](https://conda.anaconda.org/maxibor) [![Documentation Status](https://readthedocs.org/projects/sourcepredict/badge/?version=latest)](https://sourcepredict.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/161636346.svg)](https://zenodo.org/badge/latestdoi/161636346)
+[![Build Status](https://travis-ci.com/maxibor/sourcepredict.svg?token=pwT9AgYi4qJY4LTp9WUy&branch=master)](https://travis-ci.com/maxibor/sourcepredict) [![Coverage Status](https://coveralls.io/repos/github/maxibor/sourcepredict/badge.svg?branch=master)](https://coveralls.io/github/maxibor/sourcepredict?branch=master) [![Anaconda-Server Badge](https://anaconda.org/maxibor/sourcepredict/badges/installer/conda.svg)](https://conda.anaconda.org/maxibor) [![Documentation Status](https://readthedocs.org/projects/sourcepredict/badge/?version=latest)](https://sourcepredict.readthedocs.io/en/latest/?badge=latest) [![DOI](https://zenodo.org/badge/161636346.svg)](https://zenodo.org/badge/latestdoi/161636346) [![DOI](https://joss.theoj.org/papers/10.21105/joss.01540/status.svg)](https://doi.org/10.21105/joss.01540)
 
 ---
 
@@ -89,3 +89,26 @@ See the [documentation](https://sourcepredict.readthedocs.io/en/latest/custom_so
 ## Contributing Code, Documentation, or Feedback
 
 If you wish to contribute to Sourcepredict, you are welcome and encouraged to contribute by opening an issue, or creating a pull-request. All contributions will be made under the GPLv3 license. More informations can found on the [contributing page](contributing.md).
+
+## How to cite
+
+Sourcepredict has been published in [JOSS](https://joss.theoj.org/papers/10.21105/joss.01540).
+
+```
+@article{Borry2019Sourcepredict,
+	journal = {Journal of Open Source Software},
+	doi = {10.21105/joss.01540},
+	issn = {2475-9066},
+	number = {41},
+	publisher = {The Open Journal},
+	title = {Sourcepredict: Prediction of metagenomic sample sources using dimension reduction followed by machine learning classification},
+	url = {http://dx.doi.org/10.21105/joss.01540},
+	volume = {4},
+	author = {Borry, Maxime},
+	pages = {1540},
+	date = {2019-09-04},
+	year = {2019},
+	month = {9},
+	day = {4}
+}
+```
