@@ -269,10 +269,10 @@ class sourcemap():
             self.skbio_wu = beta_diversity(distance_method, self.normalized_rank.as_matrix().astype(int), ids=list(
                 self.normalized_rank.index), otu_ids=[str(i) for i in list(self.normalized_rank.columns)], tree=newick)
         except ValueError as e:
-            print(e)
-            print("""There is a polytomy ar the root of this taxonomic tree. 
-Unifrac distances wont't  work properly. 
-Computing  Bray-Curtis distance instead.
+            print("\t Warning:", e)
+            print("""\tThere is a polytomy ar the root of this taxonomic tree. 
+\tUnifrac distances wont't  work properly. 
+\tComputing  Bray-Curtis distance instead.
                 """)
             self.skbio_wu = beta_diversity('braycurtis', self.normalized_rank.as_matrix().astype(int), ids=list(
                 self.normalized_rank.index))
