@@ -270,11 +270,12 @@ class sourcemap():
                 self.normalized_rank.index), otu_ids=[str(i) for i in list(self.normalized_rank.columns)], tree=newick)
         except ValueError as e:
             print(e)
-            warnings.warn("""There is a polytomy ar the root of this taxonomic tree. 
-                      Unifrac distances wont't  work properly. 
-                      Computing  Bray-Curtis distance instead
+            print("""There is a polytomy ar the root of this taxonomic tree. 
+Unifrac distances wont't  work properly. 
+Computing  Bray-Curtis distance instead.
                 """)
-            self.skbio_wu = beta_diversity('braycurtis', self.normalized_rank.as_matrix().astype(int))
+            self.skbio_wu = beta_diversity('braycurtis', self.normalized_rank.as_matrix().astype(int), ids=list(
+                self.normalized_rank.index))
         self.wu = self.skbio_wu.to_data_frame()
 
     def embed(self, method, out_csv, seed, n_comp=200):
