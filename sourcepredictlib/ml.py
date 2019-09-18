@@ -19,6 +19,7 @@ import warnings
 import os
 import sys
 from collections import Counter
+import warnings
 
 
 parentScriptDir = "/".join(os.path.dirname(
@@ -264,8 +265,16 @@ class sourcemap():
         tree = ncbi.get_topology(
             list(self.normalized_rank.columns), intermediate_nodes=False)
         newick = TreeNode.read(StringIO(tree.write()))
-        self.skbio_wu = beta_diversity(distance_method, self.normalized_rank.as_matrix().astype(int), ids=list(
-            self.normalized_rank.index), otu_ids=[str(i) for i in list(self.normalized_rank.columns)], tree=newick)
+        try:
+            self.skbio_wu = beta_diversity(distance_method, self.normalized_rank.as_matrix().astype(int), ids=list(
+                self.normalized_rank.index), otu_ids=[str(i) for i in list(self.normalized_rank.columns)], tree=newick)
+        except ValueError as e:
+            print(e)
+            warnings.warn("""There is a polytomy ar the root of this taxonomic tree. 
+                      Unifrac distances wont't  work properly. 
+                      Computing  Bray-Curtis distance instead
+                """)
+            self.skbio_wu = beta_diversity('braycurtis', self.normalized_rank.as_matrix().astype(int))
         self.wu = self.skbio_wu.to_data_frame()
 
     def embed(self, method, out_csv, seed, n_comp=200):
