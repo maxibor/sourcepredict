@@ -143,7 +143,7 @@ def test_sourcemap_embed_MDS(sm):
 
     assert generate_pd_md5(sm.my_embed) in [
         'a05d18d0d35a39ec3cd63464089fb2bf', 'f876bd2095f36beb3ec8925558148a15']
-    assert generate_pd_md5(sm.ref_t) == '96eb677be04de2db784048428b1b581d'
+    assert generate_pd_md5(sm.ref_t) in ['96eb677be04de2db784048428b1b581d', '9cdf5d5916cc94000e19caed1d1948fd']
     assert generate_pd_md5(sm.sink_t) == '9f7a4b87e58194db1cd7357a031de217'
 
 
