@@ -124,7 +124,7 @@ class sourceunknown():
                                 ['unknown'] * self.ref_u.shape[1], index=self.normalized_ref_u.columns, name='labels')
         try:
             self.sink = self.normalized.drop(
-                self.ref.columns, axis=1).T
+                self.ref.columns, axis=1, errors='ignore').T
         except KeyError:
             print(f"ERROR: Test sample present in training dataset")
             sys.exit(1)
@@ -157,7 +157,7 @@ class sourceunknown():
         self.my_embed = my_embed
         self.my_embed.set_index(self.bc.index, inplace=True)
 
-        self.ref_u = self.my_embed.drop(self.tmp_sink.columns, axis=0)
+        self.ref_u = self.my_embed.drop(self.tmp_sink.columns, axis=0, errors = 'ignore')
         self.ref_u = self.ref_u.merge(
             self.labels.to_frame(), left_index=True, right_index=True)
         self.sink = self.my_embed.loc[self.tmp_sink.columns, :]
@@ -328,8 +328,8 @@ class sourcemap():
 
         self.ref_t = self.my_embed.drop(self.test_samples, axis=0)
         self.ref_t = self.ref_t.merge(
-            self.labels.to_frame(), left_index=True, right_index=True)
-        self.sink_t = self.my_embed.drop(self.train_samples, axis=0)
+            self.labels.to_frame(), left_index=True, right_index=True).dropna(axis=0)
+        self.sink_t = self.my_embed.drop(self.train_samples, axis=0).dropna(axis=0)
 
     def knn_classification(self, kfold, threads, seed, neighbors, weigth):
         """Performs KNN classification

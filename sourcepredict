@@ -56,6 +56,12 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         help="Distance method. (unweighted_unifrac | weighted_unifrac) Default = weighted_unifrac"
     )
     parser.add_argument(
+        '-r',
+        dest="tax_rank",
+        default='species',
+        help="Taxonomic rank to use for Unifrac distances. Default = species"
+    )
+    parser.add_argument(
         '-me',
         dest="method",
         default='TSNE',
@@ -114,6 +120,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     labels = args.labels
     seed = int(args.seed)
     distance = args.distance
+    rank = args.tax_rank
     method = args.method
     neighbors = int(args.neighbors)
     weights = args.weights
@@ -123,13 +130,13 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     kfold = int(args.kfold)
     threads = int(args.threads)
 
-    return(sink, alpha, normalization, sources, labels, seed, distance, method, neighbors, weights, dim, output, embed, kfold, threads)
+    return(sink, alpha, normalization, sources, labels, seed, distance, rank, method, neighbors, weights, dim, output, embed, kfold, threads)
 
 
 if __name__ == "__main__":
     version = "0.34"
     warnings.filterwarnings("ignore")
-    SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, DISTANCE, METHOD, NEIGHBORS, WEIGTHS, DIM, OUTPUT, EMBED_CSV, KFOLD, THREADS = _get_args()
+    SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, DISTANCE, RANK, METHOD, NEIGHBORS, WEIGTHS, DIM, OUTPUT, EMBED_CSV, KFOLD, THREADS = _get_args()
     SEED = utils.check_gen_seed(SEED)
     np.random.seed(SEED)
     embed_method = utils.check_embed(METHOD)
@@ -138,7 +145,6 @@ if __name__ == "__main__":
     predictions = {}
     distance_method = utils.check_distance(DISTANCE)
     weigth = utils.check_weigths(WEIGTHS)
-    tax_rank = "species"
     samp_pred = {}
     print("Step 1: Checking for unknown proportion")
     if ALPHA == 0:
@@ -166,8 +172,8 @@ if __name__ == "__main__":
     print("Step 2: Checking for source proportion")
     sm = sourcemap(source=SOURCES, sink=SINK, labels=LABELS,
                    norm_method=normalization, threads=THREADS)
-    print(f"\tComputing {distance_method} distance on {tax_rank} rank")
-    sm.compute_distance(distance_method=distance_method, rank=tax_rank)
+    print(f"\tComputing {distance_method} distance on {RANK} rank")
+    sm.compute_distance(distance_method=distance_method, rank=RANK)
     print(f"\t{embed_method} embedding in {DIM} dimension{utils.plural(DIM)}")
     sm.embed(n_comp=DIM, method=embed_method, seed=SEED, out_csv=EMBED_CSV)
     print("\tKNN machine learning")
