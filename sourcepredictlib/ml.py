@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+
+
 import pandas as pd
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
@@ -9,6 +11,7 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.manifold import TSNE
 from sklearn.model_selection import cross_val_score
 from sklearn import metrics
+from sklego.mixture import GMMClassifier
 from skbio.diversity import beta_diversity
 from skbio.stats.ordination import pcoa as skbio_mds
 from skbio import TreeNode
@@ -27,10 +30,7 @@ parentScriptDir = "/".join(os.path.dirname(
 sys.path.append(parentScriptDir+"/sourcepredictlib")
 
 import normalize
-
-import utils
-
-
+import utils 
 class sourceunknown():
 
     def __init__(self, source, sink, labels):
@@ -168,7 +168,7 @@ class sourceunknown():
             to_write['name'] = to_write.index
             to_write.to_csv(out_csv)
 
-    def ml(self, seed, threads):
+    def knn_classification(self, seed, threads):
         """KNN machine learning
 
         KNN machine learning to predict unknown proportion
@@ -181,6 +181,7 @@ class sourceunknown():
         Returns:
             dict: Probability/proportion of each class
         """
+
         train_u_features, test_u_features, train_u_labels, test_u_labels = train_test_split(
             self.ref_u.drop('labels', axis=1), self.ref_u.loc[:, 'labels'], test_size=0.2, random_state=seed)
         train_u_features, validation_u_features, train_u_labels, validation_u_labels = train_test_split(
@@ -243,6 +244,7 @@ class sourcemap():
         self.test_samples = list(self.test.columns)
         labels = pd.read_csv(labels, index_col=0)
         self.labels = labels.loc[self.train.columns, 'labels']
+        self.n_components = self.labels.value_counts().size
 
     def compute_distance(self, distance_method, rank='species'):
         """Sample pairwise distance computation
@@ -330,6 +332,23 @@ class sourcemap():
         self.ref_t = self.ref_t.merge(
             self.labels.to_frame(), left_index=True, right_index=True)
         self.sink_t = self.my_embed.drop(self.train_samples, axis=0)
+
+    def gmm_classification(self, seed):
+        train_t_features, test_t_features, train_t_labels, test_t_labels = train_test_split(
+            self.ref_t.drop('labels', axis=1), self.ref_t.loc[:, 'labels'], test_size=0.2, random_state=seed)
+
+        gmm_c = GMMClassifier(n_components=4, random_state=seed)
+        gmm_c.fit(train_t_features, train_t_labels)
+
+        y_pred = gmm_c.predict(test_t_features)
+        print("\t-> Testing Accuracy:", round(metrics.accuracy_score(
+            test_t_labels, y_pred), 2))
+        self.sink_pred = np.nan_to_num(gmm_c.predict_proba(self.sink_t), nan=0)
+        utils.print_class(samples=self.sink_t.index,
+                          classes=gmm_c.classes_, pred=self.sink_pred)
+        p_c = utils.class2dict(
+            samples=self.sink_t.index, classes=gmm_c.classes_, pred=self.sink_pred)
+        return(p_c)
 
     def knn_classification(self, kfold, threads, seed, neighbors, weigth):
         """Performs KNN classification

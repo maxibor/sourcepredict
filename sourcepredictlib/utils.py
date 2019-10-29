@@ -63,6 +63,24 @@ def account_unk(samp_pred, umap_pred):
     return(pd.DataFrame(umap_pred))
 
 
+def account_unk_gmm(samp_pred):
+    """Account for unknown proportion after one step GMM source prediction
+
+    Args:
+        samp_pred(dict): dictionnary of samples class probability predictions
+            {samp: {class: proba}}
+    Returns:
+        pandas DataFrame: sourcepredict sample proba predictions
+            with unknown accounted for
+    """
+    for sample in samp_pred:
+        smp_tot = 0
+        for source in samp_pred[sample]:
+            smp_tot += samp_pred[sample][source]
+        samp_pred[sample]['unknown'] = 1 - smp_tot
+    return(samp_pred)
+
+
 def split_sinks(sink):
     """Split sink dataframe in individual dataframe per columns
 
@@ -163,6 +181,26 @@ def check_weigths(weight):
         sys.exit(1)
     else:
         return(weight)
+
+
+def check_ml(ml):
+    """Check if ML method is valid
+
+    Args:
+        ml(str): name of ml method
+    Returns:
+        str: lowercase weigth parameter
+    Example:
+        >>> check_ml('knn')
+        'knn'
+    """
+    ml_meth = ['knn', 'gmm']
+    ml = ml.lower()
+    if ml not in ml_meth:
+        print(f"Please check the ml method ({' or '.join(ml_meth)})")
+        sys.exit(1)
+    else:
+        return(ml)
 
 
 def check_gen_seed(seed, amin=1, amax=10000):

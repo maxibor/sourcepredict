@@ -7,9 +7,8 @@ parentScriptDir = "/".join(os.path.dirname(
     os.path.realpath(__file__)).split("/")[:-1])
 sys.path.append(parentScriptDir+"/sourcepredictlib")
 
-import ml
 import utils
-
+import ml
 
 def generate_pd_md5(pd_obj):
     """
@@ -98,7 +97,7 @@ def test_unk_ml(su):
     su.normalize(method='GMPR', threads=2)
     su.compute_distance()
     su.embed(n_comp=2, seed=42, out_csv=None)
-    res = su.ml(seed=42, threads=2)
+    res = su.knn_classification(seed=42, threads=2)
     assert round(res['metagenomebis']['known'], 3) == 0.952
     assert round(res['metagenomebis']['unknown'], 3) == 0.048
 
@@ -143,11 +142,12 @@ def test_sourcemap_embed_MDS(sm):
 
     assert generate_pd_md5(sm.my_embed) in [
         'a05d18d0d35a39ec3cd63464089fb2bf', 'f876bd2095f36beb3ec8925558148a15']
-    assert generate_pd_md5(sm.ref_t) in ['96eb677be04de2db784048428b1b581d', '9cdf5d5916cc94000e19caed1d1948fd']
+    assert generate_pd_md5(sm.ref_t) in [
+        '96eb677be04de2db784048428b1b581d', '9cdf5d5916cc94000e19caed1d1948fd']
     assert generate_pd_md5(sm.sink_t) == '9f7a4b87e58194db1cd7357a031de217'
 
 
-def test_sourcemap_ml(sm):
+def test_sourcemap_knn(sm):
     sm.compute_distance(distance_method='weighted_unifrac', rank='species')
     sm.embed(n_comp=2, method='MDS', seed=42, out_csv=None)
     res = sm.knn_classification(
@@ -157,3 +157,14 @@ def test_sourcemap_ml(sm):
     assert round(res['metagenomebis']['Escherichia_coli'], 3) == 0.125
     assert round(res['metagenome']['Bacillus_subtilis'], 3) == 0.875
     assert round(res['metagenome']['Escherichia_coli'], 3) == 0.125
+
+
+def test_sourcemap_gmm(sm):
+    sm.compute_distance(distance_method='weighted_unifrac', rank='species')
+    sm.embed(n_comp=2, method='MDS', seed=42, out_csv=None)
+    res = sm.gmm_classification(seed=42)
+
+    assert round(res['metagenomebis']['Bacillus_subtilis'], 3) == 0.0
+    assert round(res['metagenomebis']['Escherichia_coli'], 3) == 0.0
+    assert round(res['metagenome']['Bacillus_subtilis'], 3) == 0.0
+    assert round(res['metagenome']['Escherichia_coli'], 3) == 0.0
