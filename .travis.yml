@@ -18,7 +18,9 @@ install:
   - conda env create -f conda_env.yaml
   - source activate sourcepredict
 script: 
-  - python sourcepredict -s data/test/training/test_sources.csv -l data/test/training/test_labels.csv data/test/testing/test_data.csv
+  - python sourcepredict -s data/test/training/test_sources.csv -ml knn -l data/test/training/test_labels.csv data/test/testing/test_data.csv
+  - python sourcepredict -s data/test/training/test_sources.csv -ml gmm -l data/test/training/test_labels.csv data/test/testing/test_data.csv
+
   - pytest --cov sourcepredictlib  tests
 after_success:
   - coveralls
