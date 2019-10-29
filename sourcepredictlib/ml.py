@@ -337,7 +337,7 @@ class sourcemap():
         train_t_features, test_t_features, train_t_labels, test_t_labels = train_test_split(
             self.ref_t.drop('labels', axis=1), self.ref_t.loc[:, 'labels'], test_size=0.2, random_state=seed)
 
-        gmm_c = GMMClassifier(n_components=4, random_state=seed)
+        gmm_c = GMMClassifier(n_components=4, n_init=10, random_state=seed)
         gmm_c.fit(train_t_features, train_t_labels)
 
         y_pred = gmm_c.predict(test_t_features)
