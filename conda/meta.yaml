@@ -15,6 +15,7 @@ requirements:
     - scikit-bio
     - umap-learn
     - ete3
+    - scikit-lego
 
 test:
   source_files:
