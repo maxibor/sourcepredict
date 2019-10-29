@@ -5,20 +5,19 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - coverage=4.5.3
-  - coveralls=1.8.1
-  - ete3=3.1.1
-  - numpy=1.16.4
-  - pandas=0.24.1
-  - pip=19.0.1
-  - pytest=4.6.3
-  - pytest-cov=2.7.1
-  - python=3.6.8
-  - requests=2.21.0
-  - scikit-bio=0.5.5
-  - scikit-learn=0.20.1
-  - scipy=1.1.0
+  - coverage >=4.5.3
+  - coveralls >=1.8.1
+  - ete3 >=3.1.1
+  - numpy >=1.16.4
+  - pandas >=0.24.1
+  - pip >=19.0.1
+  - pytest >=4.6.3
+  - pytest-cov >=2.7.1
+  - python >=3.6.8
+  - requests >=2.21.0
+  - scikit-bio >=0.5.5
+  - scikit-learn >=0.20.1
+  - scipy  >=1.1.0
+  - scikit-lego >=0.3.3
   - pip:
     - umap-learn==0.3.7
-prefix: /Users/borry/miniconda3/envs/sourcepredict
-
