@@ -27,7 +27,7 @@ def RLE_normalize(pd_dataframe):
     step5 = step4.apply(np.median, 0)
     step6 = step5.apply(np.exp)
     step7 = pd_dataframe.divide(step6, 1).apply(round, 1)
-    return(step7)
+    return(step7.dropna(axis=1))
 
 
 def subsample_normalize_pd(pd_dataframe):
@@ -78,7 +78,7 @@ def subsample_normalize_pd(pd_dataframe):
     step2 = pd_dataframe.apply(
         subsample_normalize, axis=0, args=(themax,))
     step3 = step2.apply(np.floor, axis=1)
-    return(step3)
+    return(step3.dropna(axis=1))
 
 
 def gmpr_size_factor(col, ar):
@@ -118,4 +118,4 @@ def GMPR_normalize(df, process):
     with multiprocessing.Pool(process) as p:
         sf = p.map(gmpr_sf_partial, list(range(np.shape(ar)[1])))
 
-    return(pd.DataFrame(np.divide(ar, sf), index=df.index, columns=df.columns))
+    return(pd.DataFrame(np.divide(ar, sf), index=df.index, columns=df.columns).dropna(axis=1))

@@ -24,6 +24,7 @@ __ homepage_
    add_new_sources
    run_example
    mixed_prop
+   CDI_analysis
 
 
 Indices and tables
