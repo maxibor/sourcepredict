@@ -68,16 +68,10 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
         help="Embedding Method. TSNE, MDS, or UMAP. Default = TSNE"
     )
     parser.add_argument(
-        '-ml',
-        dest='learning',
-        default='knn',
-        help="Machine Learning model (knn or gmm). Default = knn"
-    )
-    parser.add_argument(
         '-kne',
         dest="neighbors",
         default=0,
-        help="Numbers of neigbors if KNN ML classication. Default = 0 (chosen by CV)"
+        help="Numbers of neigbors if KNN ML classication (integer or 'all'). Default = 0 (chosen by CV)"
     )
     parser.add_argument(
         '-kw',
@@ -128,8 +122,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     distance = args.distance
     rank = args.tax_rank
     method = args.method
-    ml = args.learning
-    neighbors = int(args.neighbors)
+    neighbors = str(args.neighbors)
     weights = args.weights
     dim = int(args.dim)
     output = args.output
@@ -137,19 +130,19 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
     kfold = int(args.kfold)
     threads = int(args.threads)
 
-    return(sink, alpha, normalization, sources, labels, seed, distance, rank, ml, method, neighbors, weights, dim, output, embed, kfold, threads)
+    return(sink, alpha, normalization, sources, labels, seed, distance, rank, method, neighbors, weights, dim, output, embed, kfold, threads)
 
 
 if __name__ == "__main__":
-    version = "0.34"
+    version = "0.4"
     warnings.filterwarnings("ignore")
-    SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, DISTANCE, RANK, ML, METHOD, NEIGHBORS, WEIGTHS, DIM, OUTPUT, EMBED_CSV, KFOLD, THREADS = _get_args()
+    SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, DISTANCE, RANK, METHOD, NEIGHBORS, WEIGTHS, DIM, OUTPUT, EMBED_CSV, KFOLD, THREADS = _get_args()
     SEED = utils.check_gen_seed(SEED)
     np.random.seed(SEED)
     embed_method = utils.check_embed(METHOD)
+    neighbors = utils.check_neighbors(NEIGHBORS)
     normalization = utils.check_norm(NORMALIZATION)
     sinks = utils.split_sinks(SINK)
-    ml = utils.check_ml(ML)
     predictions = {}
     distance_method = utils.check_distance(DISTANCE)
     weigth = utils.check_weigths(WEIGTHS)
@@ -158,7 +151,7 @@ if __name__ == "__main__":
     if ALPHA == 0:
         print(f"\tSkipping Step 1 for alpha = {ALPHA}")
     for s in sinks:
-        if ALPHA > 0 and ml == 'knn':
+        if ALPHA > 0 :
             sample = ''.join(list(s.columns))
             samp_pred[sample] = {}
             print(f"  == Sample: {sample} ==")
@@ -182,20 +175,14 @@ if __name__ == "__main__":
     print(f"\tComputing {distance_method} distance on {RANK} rank")
     sm.compute_distance(distance_method=distance_method, rank=RANK)
     print(f"\t{embed_method} embedding in {DIM} dimension{utils.plural(DIM)}")
-    sm.embed(n_comp=DIM, method=embed_method, seed=SEED, out_csv=EMBED_CSV)
-    if ml == 'knn':
-        print(f"\t{ml.upper()} machine learning")
-        umap_pred = sm.knn_classification(
-            kfold=KFOLD, threads=THREADS, seed=SEED, neighbors=NEIGHBORS, weigth=weigth)
-    elif ml == 'gmm':
-        print(f"\t{ml.upper()} machine learning")
-        umap_pred = sm.gmm_classification(seed=SEED)
-    if ALPHA > 0 and ml == 'knn':
-        prediction = utils.account_unk(samp_pred=samp_pred, umap_pred=umap_pred)
-    elif ml == 'knn':
-        prediction = pd.DataFrame(umap_pred)
-    if ml == 'gmm':
-        prediction = pd.DataFrame(utils.account_unk_gmm(umap_pred))
+    sm.embed(n_comp=DIM, method=embed_method, seed=SEED, threads=THREADS, out_csv=EMBED_CSV)
+    print("\tKNN machine learning")
+    source_pred = sm.knn_classification(
+        kfold=KFOLD, threads=THREADS, seed=SEED, neighbors=neighbors, weigth=weigth)
+    if ALPHA > 0 :
+        prediction = utils.account_unk(samp_pred=samp_pred, source_pred=source_pred)
+    else:
+        prediction = pd.DataFrame(source_pred)
     if OUTPUT is None:
         OUTPUT = f"{utils._get_basename(SINK)}.sourcepredict.csv"
     prediction.to_csv(OUTPUT)
