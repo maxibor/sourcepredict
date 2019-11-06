@@ -43,24 +43,24 @@ def class2dict(samples, classes, pred):
     return(resdict)
 
 
-def account_unk(samp_pred, umap_pred):
+def account_unk(samp_pred, source_pred):
     """Account for unknown proportion
 
     Args:
-        samp_pred(dict): dictionnary of samples class probability predictions
+        source_pred(dict): dictionnary of samples class probability predictions
             {samp: {class: proba}}
-        umap_pred(dict): dictionnary of samples unknown probability predictions
+        samp_pred(dict): dictionnary of samples unknown probability predictions
             {samp: {unknown: proba}}
     Returns:
         pandas DataFrame: sourcepredict sample proba predictions
             with unknown accounted for
     """
 
-    for akey in umap_pred:
-        umap_pred[akey] = {k: umap_pred[akey][k] *
-                           (1 - samp_pred[akey]['unknown']) for k in umap_pred[akey]}
-        umap_pred[akey]['unknown'] = samp_pred[akey]['unknown']
-    return(pd.DataFrame(umap_pred))
+    for akey in source_pred:
+        source_pred[akey] = {k: source_pred[akey][k] *
+                           (1 - samp_pred[akey]['unknown']) for k in source_pred[akey]}
+        source_pred[akey]['unknown'] = samp_pred[akey]['unknown']
+    return(pd.DataFrame(source_pred))
 
 
 def account_unk_gmm(samp_pred):
@@ -119,6 +119,28 @@ def check_norm(method):
         sys.exit(1)
     else:
         return(method)
+
+
+def check_neighbors(neighbors):
+    """Check if neighbors is valid
+
+    Args:
+        neighbors(str): number of neighbors or 'all'
+    Returns:
+        numbers of neighbors(int) or 'all'(str) 
+    Example:
+        >>> check_neighbors('12')
+        12
+        >>> check_neighbors('all')
+        'all'
+    """
+    if neighbors.isdigit():
+        return(int(neighbors))
+    elif neighbors.lower() == 'all':
+        return('all')
+    else:
+        print("Please check the neighbors arguments (interger or 'all')")
+        sys.exit(1)
 
 
 def check_embed(method):
@@ -181,27 +203,6 @@ def check_weigths(weight):
         sys.exit(1)
     else:
         return(weight)
-
-
-def check_ml(ml):
-    """Check if ML method is valid
-
-    Args:
-        ml(str): name of ml method
-    Returns:
-        str: lowercase weigth parameter
-    Example:
-        >>> check_ml('knn')
-        'knn'
-    """
-    ml_meth = ['knn', 'gmm']
-    ml = ml.lower()
-    if ml not in ml_meth:
-        print(f"Please check the ml method ({' or '.join(ml_meth)})")
-        sys.exit(1)
-    else:
-        return(ml)
-
 
 def check_gen_seed(seed, amin=1, amax=10000):
     """Check random seed
