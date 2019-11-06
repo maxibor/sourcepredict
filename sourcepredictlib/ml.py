@@ -8,10 +8,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 from sklearn.calibration import CalibratedClassifierCV
-from sklearn.manifold import TSNE
+from sklearn.manifold import TSNE, MDS
 from sklearn.model_selection import cross_val_score
 from sklearn import metrics
-from sklego.mixture import GMMClassifier
 from skbio.diversity import beta_diversity
 from skbio.stats.ordination import pcoa as skbio_mds
 from skbio import TreeNode
@@ -280,7 +279,7 @@ class sourcemap():
                 self.normalized_rank.index))
         self.wu = self.skbio_wu.to_data_frame()
 
-    def embed(self, method, out_csv, seed, n_comp=200):
+    def embed(self, method, out_csv, seed, threads=1, n_comp=2):
         """Distance matrix embedding
 
         Embedding of a distance matrix in lower dimensions
@@ -303,21 +302,12 @@ class sourcemap():
                          n_components=n_comp, random_state=seed)
             my_embed = embed.fit(np.matrix(self.wu))
         elif method == 'MDS':
-            embed = skbio_mds(
-                self.skbio_wu, number_of_dimensions=n_comp, method='fsvd')
-            my_embed = pd.DataFrame()
-            for i in range(n_comp):
-                my_embed[f"PC{i+1}"] = list(embed.samples.loc[:, f"PC{i+1}"])
-        else:
-            print(f"Error, {method} embedding method not supported")
-            sys.exit(1)
+            embed = MDS(metric=True,n_components=n_comp, 
+                    random_state=seed, n_jobs=threads, n_init=6, dissimilarity = 'precomputed')
+            my_embed = embed.fit(np.matrix(self.wu))
 
-        if method in (['TSNE', 'UMAP']):
-            self.my_embed = pd.DataFrame(
-                my_embed.embedding_, columns=cols, index=self.wu.index)
-        elif method == 'MDS':
-            self.my_embed = my_embed
-            self.my_embed.set_index(self.wu.index, inplace=True)
+        self.my_embed = pd.DataFrame(
+            my_embed.embedding_, columns=cols, index=self.wu.index)
 
         if out_csv:
             to_write = self.my_embed.copy(deep=True)
@@ -332,23 +322,6 @@ class sourcemap():
         self.ref_t = self.ref_t.merge(
             self.labels.to_frame(), left_index=True, right_index=True).dropna(axis=0)
         self.sink_t = self.my_embed.drop(self.train_samples, axis=0).dropna(axis=0)
-
-    def gmm_classification(self, seed):
-        train_t_features, test_t_features, train_t_labels, test_t_labels = train_test_split(
-            self.ref_t.drop('labels', axis=1), self.ref_t.loc[:, 'labels'], test_size=0.2, random_state=seed)
-
-        gmm_c = GMMClassifier(n_components=4, n_init=10, random_state=seed)
-        gmm_c.fit(train_t_features, train_t_labels)
-
-        y_pred = gmm_c.predict(test_t_features)
-        print("\t-> Testing Accuracy:", round(metrics.accuracy_score(
-            test_t_labels, y_pred), 2))
-        self.sink_pred = np.nan_to_num(gmm_c.predict_proba(self.sink_t), nan=0)
-        utils.print_class(samples=self.sink_t.index,
-                          classes=gmm_c.classes_, pred=self.sink_pred)
-        p_c = utils.class2dict(
-            samples=self.sink_t.index, classes=gmm_c.classes_, pred=self.sink_pred)
-        return(p_c)
 
     def knn_classification(self, kfold, threads, seed, neighbors, weigth):
         """Performs KNN classification
@@ -372,6 +345,9 @@ class sourcemap():
 
         knn_c = KNeighborsClassifier(n_jobs=threads)
 
+        if neighbors == 'all':
+            neighbors = np.size(train_t_features,0)
+            
         if neighbors == 0:
 
             param_knn_grid = {
@@ -401,11 +377,7 @@ class sourcemap():
         print("\t-> Testing Accuracy:", round(metrics.accuracy_score(
             test_t_labels, y_pred), 2))
 
-        cal_knn_c = CalibratedClassifierCV(
-            knn2_c, cv='prefit', method='sigmoid')
-        cal_knn_c.fit(validation_t_features, validation_t_labels)
-
-        self.sink_pred = cal_knn_c.predict_proba(self.sink_t)
+        self.sink_pred = knn2_c.predict_proba(self.sink_t)
         utils.print_class(samples=self.sink_t.index,
                           classes=knn2_c.classes_, pred=self.sink_pred)
         p_c = utils.class2dict(
