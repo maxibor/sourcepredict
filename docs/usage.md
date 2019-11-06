@@ -15,14 +15,15 @@ $ sourcepredict -s sp_sources.csv -l sp_labels.csv dog_example.csv
 
 ```bash
 $ sourcepredict -h
-usage: SourcePredict v0.34 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
-                           [-n NORMALIZATION] [-dt DISTANCE] [-me METHOD]
-                           [-kne NEIGHBORS] [-kw WEIGHTS] [-e EMBED] [-di DIM]
-                           [-o OUTPUT] [-se SEED] [-k KFOLD] [-t THREADS]
-                           sink_table
+usage: SourcePredict v0.4 [-h] [-a ALPHA] [-s SOURCES] [-l LABELS]
+                          [-n NORMALIZATION] [-dt DISTANCE] [-r TAX_RANK]
+                          [-me METHOD] [-kne NEIGHBORS] [-kw WEIGHTS]
+                          [-e EMBED] [-di DIM] [-o OUTPUT] [-se SEED]
+                          [-k KFOLD] [-t THREADS]
+                          sink_table
 
 ==========================================================
-SourcePredict v0.33
+SourcePredict v0.4
 Coprolite source classification
 Author: Maxime Borry
 Contact: <borry[at]shh.mpg.de>
@@ -31,7 +32,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
 
 
 positional arguments:
-  sink_table   path to sink TAXID count table in csv format
+  sink_table        path to sink TAXID count table in csv format
 
 optional arguments:
   -h, --help        show this help message and exit
@@ -44,9 +45,11 @@ optional arguments:
                     Default = GMPR
   -dt DISTANCE      Distance method. (unweighted_unifrac | weighted_unifrac)
                     Default = weighted_unifrac
+  -r TAX_RANK       Taxonomic rank to use for Unifrac distances. Default =
+                    species
   -me METHOD        Embedding Method. TSNE, MDS, or UMAP. Default = TSNE
-  -kne NEIGHBORS    Numbers of neigbors for KNN classication. Default = 0
-                    (chosen by CV)
+  -kne NEIGHBORS    Numbers of neigbors if KNN ML classication (integer or
+                    'all'). Default = 0 (chosen by CV)
   -kw WEIGHTS       Sample weight function for KNN prediction (distance |
                     uniform). Default = distance.
   -e EMBED          Output embedding csv file. Default = None
@@ -151,13 +154,16 @@ _Example:_
 ### -kne NEIGHBORS
 
 Numbers of neigbors for KNN classication. Default = 0 (chosen by CV).
+Either an integer, or 'all'
 
 _Example:_
 
 `-kne 30`
+`-kne all`
 
-> Setting the number of neighbors to 0 will let Sourcepredict choose the optimal number of neighbors for **classification**.  
-However, for **source proportion estimation**, setting manually a higher number of samples (for example, 50) will help for better proportion estimations.  
+> Setting the number of neighbors to 0 will let Sourcepredict choose the optimal number of neighbors for **classification**.
+If set to `all`, the KNN algorithm will use all the training samples.
+For **source proportion estimation**, setting `-kne` to *all* will give better estimations.  
 See [example 2](https://sourcepredict.readthedocs.io/en/latest/mixed_prop.html) for illustration.
 
 ### --kw WEIGHTS
