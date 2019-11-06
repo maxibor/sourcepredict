@@ -5,8 +5,7 @@ package:
   version: {{ version }}
 
 source:
-  git_rev: {{ version }}
-  git_url: https://github.com/maxibor/sourcepredict.git
+  path: ../
 
 requirements:
   run:
@@ -29,4 +28,4 @@ about:
   license: GPL-3.0
   summary: 'Prediction/source tracking of sample source using composite learning'
 
-# Build using: conda build .
+# Build using: conda build -c conda-forge -c etetoolkit -c bioconda .
