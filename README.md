@@ -14,7 +14,7 @@ Sourcepredict solves this problem by using machine learning classification on di
 ## Installation
 
 ```
-$ conda install -c conda-forge -c etetoolkit -c bioconda -c maxibor sourcepredict
+$ conda install -c conda-forge -c maxibor sourcepredict
 ```
 
 ## Example
