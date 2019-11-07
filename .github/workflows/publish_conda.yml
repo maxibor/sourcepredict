@@ -11,5 +11,4 @@ jobs:
       uses: maxibor/conda-package-publish-action@master
       with:
         subDir: 'conda'
-        AnacondaUsername: ${{ secrets.ANACONDA_PASSWORD }}
-        AnacondaPassword: ${{ secrets.ANACONDA_USERNAME }}
+        AnacondaToken: ${{ secrets.ANACONDA_TOKEN }}
