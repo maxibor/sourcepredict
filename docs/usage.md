@@ -145,7 +145,7 @@ _Example:_
 
 ### -me METHOD
 
-Embedding Method. One of `TSNE` or `UMAP`. Default = `TSNE`
+Embedding Method. One of `MDS`, `TSNE` or `UMAP`. Default = `TSNE`
 
 _Example:_
 
