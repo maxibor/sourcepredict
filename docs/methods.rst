@@ -82,11 +82,8 @@ The 2-dimensional embedding is then split back to training
   :math:`{}^{tsne}D_{validation}` (:math:`16\%`).
 | The KNN algorithm is then trained on the train subset, with a five
   (default) cross validation to look for the optimum number of
-  K-neighbors. The training accuracy is then computed with
-  :math:`{}^{tsne}D_{test}`. Finally, this second trained KNN model is
-  also corrected for source proportion estimation using the scikit-learn
-  implementation of the Platt’s method with
-  :math:`{}^{tsne}D_{validation}`.
+  K-neighbors. Finally, the training accuracy is then computed with
+  :math:`{}^{tsne}D_{test}`.
 
 The proportion :math:`p_{c_s} \in [0,1]` of each of the :math:`n_s`
 sources :math:`c_s \in \{c_{1},\ ..,\ c_{n_s}\}` in each sample
