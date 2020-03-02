@@ -261,7 +261,7 @@ class sourcemap():
             list(self.normalized_rank.columns), intermediate_nodes=False)
         newick = TreeNode.read(StringIO(tree.write()))
         try:
-            self.skbio_wu = beta_diversity(distance_method, self.normalized_rank.as_matrix().astype(int), ids=list(
+            self.skbio_wu = beta_diversity(distance_method, self.normalized_rank.to_numpy().astype(int), ids=list(
                 self.normalized_rank.index), otu_ids=[str(i) for i in list(self.normalized_rank.columns)], tree=newick)
         except ValueError as e:
             print("\t Warning:", e)
@@ -269,7 +269,7 @@ class sourcemap():
 \tUnifrac distances wont't  work properly. 
 \tComputing  Bray-Curtis distance instead.
                 """)
-            self.skbio_wu = beta_diversity('braycurtis', self.normalized_rank.as_matrix().astype(int), ids=list(
+            self.skbio_wu = beta_diversity('braycurtis', self.normalized_rank.to_numpy().astype(int), ids=list(
                 self.normalized_rank.index))
         self.wu = self.skbio_wu.to_data_frame()
 
