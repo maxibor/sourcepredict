@@ -3,18 +3,23 @@
 
 ---
 
-
-
-
-<img src="img/sourcepredict_logo.png" width="300">
+<img src="https://raw.githubusercontent.com/maxibor/sourcepredict/master/img/sourcepredict_logo.png" width="300">
 
 Sourcepredict is a Python package distributed through Conda, to classify and predict the origin of metagenomic samples, given a reference dataset of known origins, a problem also known as source tracking.
 Sourcepredict solves this problem by using machine learning classification on dimensionally reduced datasets.
 
 ## Installation
 
-```
+With conda (recommended)
+
+```bash
 $ conda install -c conda-forge -c maxibor sourcepredict
+```
+
+With pip
+
+```bash
+$ pip install sourcepredict
 ```
 
 ## Example
@@ -77,8 +82,8 @@ The documentation of SourcePredict is available here: [sourcepredict.readthedocs
 
 - The sources were obtained with a simple [Nextflow pipeline](https://github.com/maxibor/kraken-nf), with Kraken2 using the [*MiniKraken2_v2_8GB*](https://ccb.jhu.edu/software/kraken2/dl/minikraken2_v2_8GB.tgz).  
 See the [documentation](https://sourcepredict.readthedocs.io/en/latest/custom_sources.html) for more informations on how to build a custom source file. 
-- The example source file is here [data/modern_gut_microbiomes_sources.csv](data/modern_gut_microbiomes_sources.csv)
-- The example label file is here [data/modern_gut_microbiomes_sources.csv](data/modern_gut_microbiomes_labels.csv)
+- The example source file is here [data/modern_gut_microbiomes_sources.csv](https://github.com/maxibor/sourcepredict/data/modern_gut_microbiomes_sources.csv)
+- The example label file is here [data/modern_gut_microbiomes_sources.csv](https://github.com/maxibor/sourcepredict/data/modern_gut_microbiomes_labels.csv)
 
 
 ### Environments included in the example source file
@@ -89,7 +94,7 @@ See the [documentation](https://sourcepredict.readthedocs.io/en/latest/custom_so
 
 ## Contributing Code, Documentation, or Feedback
 
-If you wish to contribute to Sourcepredict, you are welcome and encouraged to contribute by opening an issue, or creating a pull-request. All contributions will be made under the GPLv3 license. More informations can found on the [contributing page](contributing.md).
+If you wish to contribute to Sourcepredict, you are welcome and encouraged to contribute by opening an issue, or creating a pull-request. All contributions will be made under the GPLv3 license. More informations can found on the [contributing page](https://github.com/maxibor/sourcepredict/contributing.md).
 
 ## How to cite
 

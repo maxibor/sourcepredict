@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 
 import argparse
-from sourcepredictlib.ml import sourceunknown
-from sourcepredictlib.ml import sourcemap
-from sourcepredictlib import utils
+from . sourcepredictlib import ml 
+from . sourcepredictlib import utils
 import os
 import pandas as pd
 import numpy as np
 import warnings
 import sys
+from . import __version__
 
 
 def _get_args():
     '''This function parses and return arguments passed in'''
     parser = argparse.ArgumentParser(
-        prog='SourcePredict v' + str(version),
+        prog='SourcePredict v' + __version__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=f'''
 ==========================================================
-SourcePredict v{version}
+SourcePredict v{__version__}
 Coprolite source classification
 Author: Maxime Borry
 Contact: <borry[at]shh.mpg.de>
@@ -132,9 +132,7 @@ Homepage & Documentation: github.com/maxibor/sourcepredict
 
     return(sink, alpha, normalization, sources, labels, seed, distance, rank, method, neighbors, weights, dim, output, embed, kfold, threads)
 
-
-if __name__ == "__main__":
-    version = "0.4"
+def main():
     warnings.filterwarnings("ignore")
     SINK, ALPHA, NORMALIZATION, SOURCES, LABELS, SEED, DISTANCE, RANK, METHOD, NEIGHBORS, WEIGTHS, DIM, OUTPUT, EMBED_CSV, KFOLD, THREADS = _get_args()
     SEED = utils.check_gen_seed(SEED)
@@ -155,7 +153,7 @@ if __name__ == "__main__":
             sample = ''.join(list(s.columns))
             samp_pred[sample] = {}
             print(f"  == Sample: {sample} ==")
-            su = sourceunknown(source=SOURCES, sink=s, labels=LABELS)
+            su = ml.sourceunknown(source=SOURCES, sink=s, labels=LABELS)
             print("\tAdding unknown")
             su.add_unknown(alpha=ALPHA, seed=SEED)
             print(f"\tNormalizing ({normalization})")
@@ -170,7 +168,7 @@ if __name__ == "__main__":
             samp_pred[sample]['unknown'] = pred[sample]['unknown']
 
     print("Step 2: Checking for source proportion")
-    sm = sourcemap(source=SOURCES, sink=SINK, labels=LABELS,
+    sm = ml.sourcemap(source=SOURCES, sink=SINK, labels=LABELS,
                    norm_method=normalization, threads=THREADS)
     print(f"\tComputing {distance_method} distance on {RANK} rank")
     sm.compute_distance(distance_method=distance_method, rank=RANK)
@@ -189,3 +187,6 @@ if __name__ == "__main__":
     print(f"Sourcepredict result written to {OUTPUT}")
     if EMBED_CSV:
         print(f"Embedding coordinates written to {EMBED_CSV}")
+
+if __name__ == "__main__":
+    main()

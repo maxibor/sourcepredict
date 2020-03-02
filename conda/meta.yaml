@@ -1,4 +1,4 @@
-{% set version = "0.4" %}
+{% set version = "0.5" %}
 
 package:
   name: sourcepredict
@@ -11,12 +11,13 @@ source:
 requirements:
   run:
     - python 3.6.*
-    - numpy
-    - pandas
-    - scikit-learn
-    - scikit-bio
-    - umap-learn
-    - ete3
+    - numpy >=1.16.4
+    - pandas >=0.24.1
+    - scikit-learn >=0.20.1
+    - scikit-bio >=0.5.5
+    - umap-learn >=0.3.7
+    - scipy >=1.1.0
+    - ete3 >=3.1.1
     
 test:
   source_files:

@@ -3,12 +3,8 @@ import os
 import pytest
 import hashlib
 
-parentScriptDir = "/".join(os.path.dirname(
-    os.path.realpath(__file__)).split("/")[:-1])
-sys.path.append(parentScriptDir+"/sourcepredictlib")
-
-import utils
-import ml
+from sourcepredict.sourcepredictlib import utils
+from sourcepredict.sourcepredictlib import ml
 
 def generate_pd_md5(pd_obj):
     """

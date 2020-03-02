@@ -4,11 +4,7 @@ import numpy as np
 import pandas as pd
 from io import StringIO
 
-parentScriptDir = "/".join(os.path.dirname(
-    os.path.realpath(__file__)).split("/")[:-1])
-sys.path.append(parentScriptDir+"/sourcepredictlib")
-
-import utils
+from sourcepredict.sourcepredictlib import utils
 
 
 def test_checks():

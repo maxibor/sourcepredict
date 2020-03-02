@@ -6,6 +6,7 @@ joss-logo.png
 *.bz2
 .DS_Store
 .~lock*
+local
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
