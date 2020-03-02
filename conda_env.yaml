@@ -1,4 +1,4 @@
-name: sourcepredict
+name: sourcepredict_test
 channels:
   - conda-forge
   - bioconda

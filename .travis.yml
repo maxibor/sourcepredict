@@ -15,7 +15,7 @@ install:
   - conda info -a
 
   - conda env create -f conda_env.yaml
-  - source activate sourcepredict
+  - source activate sourcepredict_test
 
 script: 
   - python setup.py install
