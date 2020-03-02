@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
 import argparse
-from . sourcepredictlib import ml 
+from . sourcepredictlib import ml
 from . sourcepredictlib import utils
 import os
 import pandas as pd
 import numpy as np
 import warnings
-import sys
 from . import __version__
 
 
@@ -141,7 +140,6 @@ def main():
     neighbors = utils.check_neighbors(NEIGHBORS)
     normalization = utils.check_norm(NORMALIZATION)
     sinks = utils.split_sinks(SINK)
-    predictions = {}
     distance_method = utils.check_distance(DISTANCE)
     weigth = utils.check_weigths(WEIGTHS)
     samp_pred = {}
