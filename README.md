@@ -82,8 +82,8 @@ The documentation of SourcePredict is available here: [sourcepredict.readthedocs
 
 - The sources were obtained with a simple [Nextflow pipeline](https://github.com/maxibor/kraken-nf), with Kraken2 using the [*MiniKraken2_v2_8GB*](https://ccb.jhu.edu/software/kraken2/dl/minikraken2_v2_8GB.tgz).  
 See the [documentation](https://sourcepredict.readthedocs.io/en/latest/custom_sources.html) for more informations on how to build a custom source file. 
-- The example source file is here [data/modern_gut_microbiomes_sources.csv](https://github.com/maxibor/sourcepredict/data/modern_gut_microbiomes_sources.csv)
-- The example label file is here [data/modern_gut_microbiomes_sources.csv](https://github.com/maxibor/sourcepredict/data/modern_gut_microbiomes_labels.csv)
+- The example source file is here [modern_gut_microbiomes_sources.csv](https://github.com/maxibor/sourcepredict/raw/master/data/modern_gut_microbiomes_sources.csv)
+- The example label file is here [modern_gut_microbiomes_sources.csv](https://github.com/maxibor/sourcepredict/raw/master/data/modern_gut_microbiomes_labels.csv)
 
 
 ### Environments included in the example source file
@@ -94,7 +94,7 @@ See the [documentation](https://sourcepredict.readthedocs.io/en/latest/custom_so
 
 ## Contributing Code, Documentation, or Feedback
 
-If you wish to contribute to Sourcepredict, you are welcome and encouraged to contribute by opening an issue, or creating a pull-request. All contributions will be made under the GPLv3 license. More informations can found on the [contributing page](https://github.com/maxibor/sourcepredict/contributing.md).
+If you wish to contribute to Sourcepredict, you are welcome and encouraged to contribute by opening an issue, or creating a pull-request. All contributions will be made under the GPLv3 license. More informations can found on the [contributing page](https://github.com/maxibor/sourcepredict/blob/master/contributing.md).
 
 ## How to cite
 
