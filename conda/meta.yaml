@@ -9,6 +9,9 @@ source:
   git_url: https://github.com/maxibor/sourcepredict.git
 
 requirements:
+  build:
+    - python 3.6.*
+    - setuptools
   run:
     - python 3.6.*
     - numpy >=1.16.4
