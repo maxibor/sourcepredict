@@ -2,8 +2,7 @@ name: publish_pypi
 
 on: 
   release:
-    types:
-      - published
+    types: [published, edited]
 
 jobs:
     build-and-publish:
