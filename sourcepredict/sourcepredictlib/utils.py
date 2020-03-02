@@ -2,7 +2,6 @@
 
 import sys
 import random
-import numpy as np
 import pandas as pd
 
 
@@ -16,11 +15,10 @@ def print_class(samples, classes, pred):
     """
 
     print("\t----------------------")
-    for i in range(0, len(samples)):
-        sample = samples[i]
+    for ix, sample in enumerate(samples):
         print(f"\t- Sample: {sample}")
-        [print(f'\t\t {i}:{round(j*100,2)}%')
-         for i, j in zip(list(classes), list(pred[i, :]))]
+        [print(f'\t\t {i}:{round(j*100,2)}%') for i, j 
+        in zip(list(classes), list(pred[ix, :]))]
 
 
 def class2dict(samples, classes, pred):
@@ -36,10 +34,9 @@ def class2dict(samples, classes, pred):
     """
 
     resdict = {}
-    for i in range(0, len(samples)):
-        sample = samples[i]
+    for ix, sample in enumerate(samples):
         resdict[sample] = {c: float(p) for (c, p) in zip(
-            list(classes), list(pred[i, :]))}
+            list(classes), list(pred[ix, :]))}
     return(resdict)
 
 
