@@ -9,7 +9,6 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import train_test_split
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.manifold import TSNE, MDS
-from sklearn.model_selection import cross_val_score
 from sklearn import metrics
 from skbio.diversity import beta_diversity
 from skbio.stats.ordination import pcoa as skbio_mds
@@ -21,15 +20,10 @@ import warnings
 import os
 import sys
 from collections import Counter
-import warnings
 
+from . import normalize
+from . import utils
 
-parentScriptDir = "/".join(os.path.dirname(
-    os.path.realpath(__file__)).split("/")[:-1])
-sys.path.append(parentScriptDir+"/sourcepredictlib")
-
-import normalize
-import utils 
 class sourceunknown():
 
     def __init__(self, source, sink, labels):
@@ -342,6 +336,8 @@ class sourcemap():
             self.ref_t.drop('labels', axis=1), self.ref_t.loc[:, 'labels'], test_size=0.2, random_state=seed)
         train_t_features, validation_t_features, train_t_labels, validation_t_labels = train_test_split(
             train_t_features, train_t_labels, test_size=0.2, random_state=seed)
+
+        del(validation_t_labels)
 
         knn_c = KNeighborsClassifier(n_jobs=threads)
 

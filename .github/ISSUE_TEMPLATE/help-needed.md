@@ -11,6 +11,6 @@ assignees: ''
 A clear and concise description of what your struggle is.
 
 **Sourcepredict version**
-Version: [e.g. 0.33]
+Version: [e.g. 0.5]
 
 OS: [e.g. Ubuntu 18.04]

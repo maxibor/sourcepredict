@@ -14,7 +14,7 @@ A clear and concise description of what the bug is.
 Steps to reproduce the behavior:
 
 **Sourcepredict version**
-Version: [e.g. 0.33]
+Version: [e.g. 0.5]
 
 **OS**
  OS: [e.g. Ubuntu 18.04]
