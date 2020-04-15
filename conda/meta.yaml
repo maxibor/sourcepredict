@@ -8,12 +8,18 @@ source:
   git_rev: {{ version }}
   git_url: https://github.com/maxibor/sourcepredict.git
 
+build:
+  number: 1
+  skip: true  # [win and py27 or win32]
+  script: {{ PYTHON }} -m pip install . --no-deps -vv
+
 requirements:
   build:
-    - python 3.6.*
+    - python
     - setuptools
+    - pip
   run:
-    - python 3.6.*
+    - python
     - numpy >=1.16.4
     - pandas >=0.24.1
     - scikit-learn >=0.20.1
