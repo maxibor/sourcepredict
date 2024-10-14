@@ -31,4 +31,4 @@ jobs:
       - name: Check sourcepredict on test data
         shell: bash -l {0}
         run: |
-          sourcepredict -s data/modern_gut_microbiomes_sources.csv -l data/modern_gut_microbiomes_labels.csv data/test/dog_test_sink_sample.cs
+          sourcepredict -s data/modern_gut_microbiomes_sources.csv -l data/modern_gut_microbiomes_labels.csv data/test/dog_test_sink_sample.csv
