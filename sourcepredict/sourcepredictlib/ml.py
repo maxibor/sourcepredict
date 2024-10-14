@@ -299,7 +299,7 @@ class sourcemap():
         elif method == 'MDS':
             embed = MDS(metric=True,n_components=n_comp, 
                     random_state=seed, n_jobs=threads, n_init=6, dissimilarity = 'precomputed')
-            my_embed = embed.fit(np.matrix(self.wu))
+            my_embed = embed.fit(np.array(self.wu))
 
         self.my_embed = pd.DataFrame(
             my_embed.embedding_, columns=cols, index=self.wu.index)
