@@ -121,7 +121,8 @@ class sourceunknown():
         except KeyError:
             print(f"ERROR: Test sample present in training dataset")
             sys.exit(1)
-        self.y_unk = self.y_unk.append(self.ref_u_labs)
+        self.y_unk = pd.concat([self.y_unk, self.ref_u_labs])
+        # self.y_unk = self.y_unk.append(self.ref_u_labs)
 
     def compute_distance(self):
         """Sample pairwise distance computation
@@ -293,8 +294,8 @@ class sourcemap():
             my_embed = embed.fit(self.wu)
         elif method == 'TSNE':
             embed = TSNE(metric='precomputed',
-                         n_components=n_comp, random_state=seed)
-            my_embed = embed.fit(np.matrix(self.wu))
+                         n_components=n_comp, random_state=seed, init='random')
+            my_embed = embed.fit(np.array(self.wu))
         elif method == 'MDS':
             embed = MDS(metric=True,n_components=n_comp, 
                     random_state=seed, n_jobs=threads, n_init=6, dissimilarity = 'precomputed')
